@@ -3,6 +3,16 @@
 Each major version raises the minimum PHP version. Only the steps that need
 changes in your code are listed.
 
+## 9.x → 10.x
+
+- PHP 8.5 or later is required.
+- PHP now warns when the result of `RoleMapper::with*()`, `LoginFlow::start()`,
+  `KeycloakClient::getAuthorizationUrl()`, `KeycloakClient::getLogoutUrl()` or
+  `RedirectTarget::isLocal()` is ignored. Ignoring it was a bug before, too;
+  use the result, or cast the call to `(void)` where ignoring it is intended.
+- `RoleMapper::__construct()` takes the realm role, client role and group
+  mappings as further optional arguments.
+
 ## 8.x → 9.x
 
 - PHP 8.4 or later is required.

@@ -34,7 +34,7 @@ final readonly class Identity
     {
         $email = $this->claims->getString('email');
 
-        return null === $email ? null : strtolower(trim($email));
+        return null === $email ? null : $email |> trim(...) |> strtolower(...);
     }
 
     public function isEmailVerified(): bool

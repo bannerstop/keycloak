@@ -6,6 +6,7 @@ namespace Bannerstop\Keycloak;
 
 use Bannerstop\Keycloak\Exception\ConfigurationException;
 use Bannerstop\Keycloak\Jwt\Algorithm;
+use Uri\Rfc3986\Uri;
 
 /**
  * Connection settings for one client of one realm.
@@ -46,11 +47,11 @@ final readonly class KeycloakConfig
         int $leeway = 30,
         int $metadataTtl = 3600,
     ) {
-        $serverUrl = rtrim($serverUrl, '/');
-        $scheme = parse_url($serverUrl, PHP_URL_SCHEME);
-        if (!in_array($scheme, ['https', 'http'], true) || null === parse_url($serverUrl, PHP_URL_HOST)) {
+        $uri = Uri::parse($serverUrl);
+        if (null === $uri || !in_array($uri->getScheme(), ['https', 'http'], true) || null === $uri->getHost()) {
             throw new ConfigurationException('The Keycloak server URL must be an absolute http(s) URL.');
         }
+        $serverUrl = rtrim($serverUrl, '/');
         if ('' === $realm || '' === $clientId) {
             throw new ConfigurationException('The realm and the client id must not be empty.');
         }

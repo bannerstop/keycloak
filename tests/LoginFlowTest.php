@@ -70,7 +70,7 @@ final class LoginFlowTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->flow()->start(self::CALLBACK, null, ['redirect_uri' => 'https://evil.example']);
+        (void) $this->flow()->start(self::CALLBACK, null, ['redirect_uri' => 'https://evil.example']);
     }
 
     public function testFinishReturnsTheVerifiedIdentity(): void

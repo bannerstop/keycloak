@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 10.0.0
+
+- Requires PHP 8.5 or later.
+- `RedirectTarget::isLocal()` resolves the target with the URI extension
+  (RFC 3986) instead of regular expressions; `KeycloakConfig` validates the
+  server URL the same way.
+- `RoleMapper` is a readonly class; its `with*()` methods use `clone with`.
+- `#[\NoDiscard]` on methods whose result must not be ignored:
+  `RoleMapper::with*()`, `LoginFlow::start()`, `KeycloakClient::getAuthorizationUrl()`,
+  `KeycloakClient::getLogoutUrl()` and `RedirectTarget::isLocal()`.
+- The pipe operator where values pass through several functions.
+
 ## 9.0.0
 
 - Requires PHP 8.4 or later.

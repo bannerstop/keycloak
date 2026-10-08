@@ -63,6 +63,7 @@ class KeycloakClient
     /**
      * @param array<string, string|int> $parameters Optional extras: prompt, login_hint, kc_idp_hint, ui_locales, max_age, acr_values, kc_action
      */
+    #[\NoDiscard]
     public function getAuthorizationUrl(PendingLogin $login, array $parameters = []): string
     {
         $unknown = array_diff(array_keys($parameters), self::AUTHORIZATION_PARAMETERS);
@@ -185,6 +186,7 @@ class KeycloakClient
      *
      * @param string|null $idToken The ID token of the session; without it Keycloak asks the user to confirm
      */
+    #[\NoDiscard]
     public function getLogoutUrl(?string $postLogoutRedirectUri = null, #[\SensitiveParameter] ?string $idToken = null): ?string
     {
         $endpoint = $this->getMetadata()->getEndSessionEndpoint();

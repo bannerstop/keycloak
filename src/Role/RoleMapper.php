@@ -15,26 +15,20 @@ use Bannerstop\Keycloak\Identity;
  * passed through as is, so a new role in Keycloak never grants access by
  * accident.
  */
-final class RoleMapper
+final readonly class RoleMapper
 {
-    /** @var string[] */
-    private array $defaultRoles;
-
-    /** @var array<string, string[]> */
-    private array $realmRoles = [];
-
-    /** @var array<string, array<string, string[]>> */
-    private array $clientRoles = [];
-
-    /** @var array<string, string[]> */
-    private array $groups = [];
-
     /**
-     * @param string[] $defaultRoles Roles every authenticated user gets
+     * @param string[]                               $defaultRoles Roles every authenticated user gets
+     * @param array<string, string[]>                $realmRoles
+     * @param array<string, array<string, string[]>> $clientRoles
+     * @param array<string, string[]>                $groups
      */
-    public function __construct(array $defaultRoles = [])
-    {
-        $this->defaultRoles = array_values($defaultRoles);
+    public function __construct(
+        private array $defaultRoles = [],
+        private array $realmRoles = [],
+        private array $clientRoles = [],
+        private array $groups = [],
+    ) {
     }
 
     /**
@@ -61,35 +55,38 @@ final class RoleMapper
     /**
      * @param string[] $roles
      */
+    #[\NoDiscard]
     public function withRealmRole(string $keycloakRole, array $roles): self
     {
-        $mapper = clone $this;
-        $mapper->realmRoles[$keycloakRole] = array_merge($this->realmRoles[$keycloakRole] ?? [], $roles);
+        $realmRoles = $this->realmRoles;
+        $realmRoles[$keycloakRole] = [...$realmRoles[$keycloakRole] ?? [], ...$roles];
 
-        return $mapper;
+        return clone($this, ['realmRoles' => $realmRoles]);
     }
 
     /**
      * @param string[] $roles
      */
+    #[\NoDiscard]
     public function withClientRole(string $clientId, string $keycloakRole, array $roles): self
     {
-        $mapper = clone $this;
-        $mapper->clientRoles[$clientId][$keycloakRole] = array_merge($this->clientRoles[$clientId][$keycloakRole] ?? [], $roles);
+        $clientRoles = $this->clientRoles;
+        $clientRoles[$clientId][$keycloakRole] = [...$clientRoles[$clientId][$keycloakRole] ?? [], ...$roles];
 
-        return $mapper;
+        return clone($this, ['clientRoles' => $clientRoles]);
     }
 
     /**
-     * @param string $group  The group as it appears in the token: a name, or a path like "/staff/it"
+     * @param string   $group The group as it appears in the token: a name, or a path like "/staff/it"
      * @param string[] $roles
      */
+    #[\NoDiscard]
     public function withGroup(string $group, array $roles): self
     {
-        $mapper = clone $this;
-        $mapper->groups[$group] = array_merge($this->groups[$group] ?? [], $roles);
+        $groups = $this->groups;
+        $groups[$group] = [...$groups[$group] ?? [], ...$roles];
 
-        return $mapper;
+        return clone($this, ['groups' => $groups]);
     }
 
     /**

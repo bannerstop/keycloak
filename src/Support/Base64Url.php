@@ -11,7 +11,10 @@ final class Base64Url
 {
     public static function encode(string $data): string
     {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        return $data
+            |> base64_encode(...)
+            |> (static fn (string $base64): string => strtr($base64, '+/', '-_'))
+            |> (static fn (string $base64url): string => rtrim($base64url, '='));
     }
 
     /**

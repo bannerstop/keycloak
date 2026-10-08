@@ -89,7 +89,7 @@ final readonly class PendingLogin
 
     public function getCodeChallenge(): string
     {
-        return Base64Url::encode(hash('sha256', $this->codeVerifier, true));
+        return hash('sha256', $this->codeVerifier, true) |> Base64Url::encode(...);
     }
 
     public function getRedirectUri(): string

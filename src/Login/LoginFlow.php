@@ -34,6 +34,7 @@ final readonly class LoginFlow
      * @param string|null               $returnTo    Where to send the user after the login
      * @param array<string, string|int> $parameters  See KeycloakClient::getAuthorizationUrl()
      */
+    #[\NoDiscard]
     public function start(string $redirectUri, ?string $returnTo = null, array $parameters = []): string
     {
         $login = PendingLogin::start($redirectUri, $returnTo, $this->client->now());

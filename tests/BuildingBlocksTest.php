@@ -105,7 +105,7 @@ final class BuildingBlocksTest extends TestCase
     public function testRoleMapperIsImmutable(): void
     {
         $base = new RoleMapper();
-        $base->withRealmRole('admin', ['ROLE_ADMIN']);
+        (void) $base->withRealmRole('admin', ['ROLE_ADMIN']);
 
         self::assertSame([], $base->map(new Identity(new Claims(['sub' => 'u', 'realm_access' => ['roles' => ['admin']]]))));
     }

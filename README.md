@@ -33,6 +33,7 @@ Composer does this for you with a `*` or a wide constraint.
 | 7.x     | ≥ 8.2   |
 | 8.x     | ≥ 8.3   |
 | 9.x     | ≥ 8.4   |
+| 10.x    | ≥ 8.5   |
 
 ## Installation
 
