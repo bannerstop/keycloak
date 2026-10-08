@@ -136,6 +136,47 @@ final class LoginFlowTest extends TestCase
         });
     }
 
+    public function testAcceptsTheIssuerParameter(): void
+    {
+        $this->realm->sendsIssuerParameter = true;
+        $state = $this->startLogin();
+        $nonce = $this->store->logins[$state]->getNonce();
+        $this->realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [200, $this->tokenResponse($nonce)]);
+
+        $result = $this->flow()->finish(['state' => $state, 'code' => 'the-code', 'iss' => FakeKeycloak::ISSUER]);
+
+        self::assertSame('jdoe', $result->getIdentity()->getUsername());
+    }
+
+    public function testRejectsACallbackOfAnotherIssuer(): void
+    {
+        $state = $this->startLogin();
+
+        $this->assertLoginFails(LoginException::PROVIDER_ERROR, function () use ($state): void {
+            $this->flow()->finish(['state' => $state, 'code' => 'the-code', 'iss' => 'https://evil.example/realms/example']);
+        });
+        self::assertCount(0, $this->realm->http->requestsTo('POST', FakeKeycloak::TOKEN_ENDPOINT), 'The code is never redeemed.');
+    }
+
+    public function testRejectsACallbackWithoutIssuerWhenTheProviderAlwaysSendsOne(): void
+    {
+        $this->realm->sendsIssuerParameter = true;
+        $state = $this->startLogin();
+
+        $this->assertLoginFails(LoginException::PROVIDER_ERROR, function () use ($state): void {
+            $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
+        });
+    }
+
+    public function testChecksTheIssuerOfErrorResponsesToo(): void
+    {
+        $state = $this->startLogin();
+
+        $this->assertLoginFails(LoginException::PROVIDER_ERROR, function () use ($state): void {
+            $this->flow()->finish(['state' => $state, 'error' => 'access_denied', 'iss' => 'https://evil.example/realms/example']);
+        });
+    }
+
     public function testReportsACancelledLogin(): void
     {
         $state = $this->startLogin();

@@ -34,6 +34,9 @@ final class FakeKeycloak
     /** @var array<int, array<string, string>> */
     private $publishedKeys;
 
+    /** @var bool Whether the discovery document announces RFC 9207 "iss" in callbacks */
+    public $sendsIssuerParameter = false;
+
     /**
      * @param string[] $allowedAlgorithms
      */
@@ -45,15 +48,18 @@ final class FakeKeycloak
         $this->publishedKeys = [$this->key->jwk()];
         $this->config = new KeycloakConfig(self::SERVER, 'example', 'app', $clientSecret, ['openid', 'email', 'profile'], $allowedAlgorithms);
 
-        $this->http->on('GET', self::ISSUER . '/.well-known/openid-configuration', [200, [
-            'issuer' => self::ISSUER,
-            'authorization_endpoint' => self::ISSUER . '/protocol/openid-connect/auth',
-            'token_endpoint' => self::TOKEN_ENDPOINT,
-            'userinfo_endpoint' => self::ISSUER . '/protocol/openid-connect/userinfo',
-            'end_session_endpoint' => self::ISSUER . '/protocol/openid-connect/logout',
-            'revocation_endpoint' => self::ISSUER . '/protocol/openid-connect/revoke',
-            'jwks_uri' => self::JWKS_URI,
-        ]]);
+        $this->http->on('GET', self::ISSUER . '/.well-known/openid-configuration', function (): array {
+            return [200, [
+                'issuer' => self::ISSUER,
+                'authorization_response_iss_parameter_supported' => $this->sendsIssuerParameter,
+                'authorization_endpoint' => self::ISSUER . '/protocol/openid-connect/auth',
+                'token_endpoint' => self::TOKEN_ENDPOINT,
+                'userinfo_endpoint' => self::ISSUER . '/protocol/openid-connect/userinfo',
+                'end_session_endpoint' => self::ISSUER . '/protocol/openid-connect/logout',
+                'revocation_endpoint' => self::ISSUER . '/protocol/openid-connect/revoke',
+                'jwks_uri' => self::JWKS_URI,
+            ]];
+        });
         $this->http->on('GET', self::JWKS_URI, function (): array {
             return [200, ['keys' => $this->publishedKeys]];
         });

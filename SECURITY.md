@@ -23,8 +23,9 @@ does not need a newer PHP version.
 - ID tokens are checked for issuer, audience, authorized party, expiry, issue
   time and nonce (OpenID Connect Core 3.1.3.7). Access tokens are checked for
   issuer, expiry, type and audience.
-- Every login uses PKCE (S256), a fresh state and a fresh nonce. A pending login
-  can be completed once and expires after ten minutes.
+- Every login uses PKCE (S256), a fresh state and a fresh nonce, and the
+  callback's issuer is checked (RFC 9207). A pending login can be completed
+  once and expires after ten minutes.
 - The "return to" URL of a login is stored as given; `RedirectTarget::isLocal()`
   and the framework integrations only redirect to local paths.
 - Secrets and tokens are hidden from `var_dump()` and never written to
