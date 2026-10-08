@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Start Keycloak
         run: |
-          docker run -d --name keycloak -p 8080:8080 \
+          docker run -d --name keycloak -p 8080:8080 --add-host=host.docker.internal:host-gateway \
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
             -v "$PWD/tests-e2e/realm.json:/opt/keycloak/data/import/realm.json:ro" \
             quay.io/keycloak/keycloak:26.4 start-dev --import-realm
@@ -57,3 +57,4 @@ jobs:
         run: php run.php
         env:
           KEYCLOAK_URL: http://localhost:8080
+          BACKCHANNEL_URL: http://host.docker.internal:8000/
