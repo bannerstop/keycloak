@@ -15,7 +15,7 @@ final class FakeHttpClient implements ClientInterface
     private array $routes = [];
 
     /** @var RequestInterface[] */
-    public array $requests = [];
+    public private(set) array $requests = [];
 
     /**
      * @param callable|array{0: int, 1: mixed} $response a [status, json] pair or a callable(RequestInterface): array

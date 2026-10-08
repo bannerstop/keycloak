@@ -76,10 +76,9 @@ final readonly class LoginFlow
             throw new LoginException(LoginFailure::InvalidToken, 'The tokens failed verification: ' . $exception->getMessage(), $exception);
         }
 
-        foreach ($this->policies as $policy) {
-            if (!$policy->allows($identity)) {
-                throw new LoginException(LoginFailure::NotAllowed, sprintf('%s rejected the identity.', $policy::class));
-            }
+        $rejecting = array_find($this->policies, static fn (IdentityPolicy $policy): bool => !$policy->allows($identity));
+        if (null !== $rejecting) {
+            throw new LoginException(LoginFailure::NotAllowed, sprintf('%s rejected the identity.', $rejecting::class));
         }
 
         return new LoginResult($identity, $tokens, $login->getReturnTo());

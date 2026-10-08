@@ -39,18 +39,12 @@ final readonly class KeySet
      */
     public function find(?string $keyId, Algorithm $algorithm): ?JsonWebKey
     {
-        $candidates = [];
-        foreach ($this->keys as $key) {
-            if (!$key->supports($algorithm)) {
-                continue;
-            }
-            if (null !== $keyId && $key->getKeyId() === $keyId) {
-                return $key;
-            }
-            $candidates[] = $key;
+        $candidates = array_values(array_filter($this->keys, static fn (JsonWebKey $key): bool => $key->supports($algorithm)));
+        if (null !== $keyId) {
+            return array_find($candidates, static fn (JsonWebKey $key): bool => $key->getKeyId() === $keyId);
         }
 
-        return null === $keyId && 1 === count($candidates) ? $candidates[0] : null;
+        return 1 === count($candidates) ? $candidates[0] : null;
     }
 
     public function isEmpty(): bool

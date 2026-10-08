@@ -109,7 +109,7 @@ final class KeycloakClientTest extends TestCase
             return [200, $users];
         });
 
-        $users = iterator_to_array((new UserDirectory($realm->client()))->users(), false);
+        $users = iterator_to_array(new UserDirectory($realm->client())->users(), false);
 
         self::assertCount(149, $users);
         self::assertSame('user0@example.com', $users[0]->getEmail());
@@ -124,7 +124,7 @@ final class KeycloakClientTest extends TestCase
         $realm = new FakeKeycloak();
         $realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [200, ['access_token' => 'service-token', 'expires_in' => 300]]);
 
-        self::assertNull((new UserDirectory($realm->client()))->find('missing'));
+        self::assertNull(new UserDirectory($realm->client())->find('missing'));
     }
 
     public function testNativeSessionStateStore(): void

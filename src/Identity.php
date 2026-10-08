@@ -120,6 +120,6 @@ final readonly class Identity
      */
     private static function stringList(mixed $value): array
     {
-        return (new Claims(['list' => $value]))->getStringList('list');
+        return new Claims(['list' => $value])->getStringList('list');
     }
 }

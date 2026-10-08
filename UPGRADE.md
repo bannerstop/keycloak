@@ -3,6 +3,13 @@
 Each major version raises the minimum PHP version. Only the steps that need
 changes in your code are listed.
 
+## 8.x → 9.x
+
+- PHP 8.4 or later is required.
+- `psr/http-message` 2, `psr/http-factory` 1.1 and `psr/simple-cache` 2 or 3
+  are required. Update your HTTP client and cache packages if Composer reports
+  a conflict.
+
 ## 7.x → 8.x
 
 - PHP 8.3 or later is required. No code changes needed.

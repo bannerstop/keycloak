@@ -9,6 +9,7 @@ use Bannerstop\Keycloak\Support\Base64Url;
 use Bannerstop\Keycloak\Tests\Fixtures\FakeKeycloak;
 use Bannerstop\Keycloak\Tests\Fixtures\TestKey;
 use Bannerstop\Keycloak\Token\TokenSet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TokenVerificationTest extends TestCase
@@ -24,9 +25,7 @@ final class TokenVerificationTest extends TestCase
         self::assertSame(['/staff/it'], $identity->getGroups());
     }
 
-    /**
-     * @dataProvider ellipticCurves
-     */
+    #[DataProvider('ellipticCurves')]
     public function testVerifiesEcdsaSignatures(string $curve, string $algorithm): void
     {
         $realm = new FakeKeycloak(TestKey::ec($curve, $algorithm), [$algorithm]);
@@ -39,7 +38,7 @@ final class TokenVerificationTest extends TestCase
     /**
      * @return array<string, string[]>
      */
-    public function ellipticCurves(): array
+    public static function ellipticCurves(): array
     {
         return [
             'P-256' => ['prime256v1', 'ES256'],
@@ -49,10 +48,9 @@ final class TokenVerificationTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidAccessTokens
-     *
      * @param array<string, mixed> $claims
      */
+    #[DataProvider('invalidAccessTokens')]
     public function testRejectsInvalidAccessTokens(array $claims, string $message): void
     {
         $realm = new FakeKeycloak();
@@ -66,7 +64,7 @@ final class TokenVerificationTest extends TestCase
     /**
      * @return array<string, array{0: array<string, mixed>, 1: string}>
      */
-    public function invalidAccessTokens(): array
+    public static function invalidAccessTokens(): array
     {
         return [
             'other issuer' => [['iss' => 'https://sso.example.com/realms/other'], 'another issuer'],

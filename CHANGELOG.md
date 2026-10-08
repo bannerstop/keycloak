@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 9.0.0
+
+- Requires PHP 8.4 or later.
+- `array_find()` replaces hand-written search loops; `new` without
+  parentheses in chained calls.
+- The end-to-end test reads the Keycloak login form with `Dom\HTMLDocument`
+  instead of regular expressions.
+- Requires `psr/http-message` 2, `psr/http-factory` 1.1 and `psr/simple-cache`
+  2 or 3, the versions without PHP 8.4 deprecations.
+
 ## 8.0.0
 
 - Requires PHP 8.3 or later.

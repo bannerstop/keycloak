@@ -6,7 +6,10 @@ declare(strict_types=1);
  * End-to-end check against a real Keycloak (see README.md in this directory).
  * Drives the browser login with plain curl, everything else goes through the library.
  */
-
+use Psr\Http\Client\ClientInterface;
+use GuzzleHttp\Client;
+use Symfony\Component\HttpClient\Psr18Client;
+use Bannerstop\Keycloak\Exception\HttpException;
 use Bannerstop\Keycloak\Admin\UserDirectory;
 use Bannerstop\Keycloak\Exception\InvalidTokenException;
 use Bannerstop\Keycloak\Exception\LoginException;
@@ -32,16 +35,16 @@ function check(bool $condition, string $what): void
     }
 }
 
-function httpClient(): Psr\Http\Client\ClientInterface
+function httpClient(): ClientInterface
 {
-    if (class_exists(GuzzleHttp\Client::class) && is_subclass_of(GuzzleHttp\Client::class, Psr\Http\Client\ClientInterface::class)) {
-        return new GuzzleHttp\Client(['timeout' => 10]);
+    if (class_exists(Client::class) && is_subclass_of(Client::class, ClientInterface::class)) {
+        return new Client(['timeout' => 10]);
     }
     if (class_exists(Http\Adapter\Guzzle6\Client::class)) {
         return Http\Adapter\Guzzle6\Client::createWithConfig(['timeout' => 10]);
     }
 
-    return new Symfony\Component\HttpClient\Psr18Client();
+    return new Psr18Client();
 }
 
 /**
@@ -54,22 +57,16 @@ function browserLogin(string $authorizationUrl, string $username, string $passwo
     $cookies = tempnam(sys_get_temp_dir(), 'kc');
     $curl = curl_init($authorizationUrl);
     curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $cookies, CURLOPT_COOKIEFILE => $cookies]);
-    $html = (string) curl_exec($curl);
-    if (1 !== preg_match('/<form[^>]+id="kc-form-login"[^>]+action="([^"]+)"/', $html, $match)) {
-        throw new RuntimeException('No login form: ' . substr($html, 0, 300));
-    }
+    $form = Dom\HTMLDocument::createFromString((string) curl_exec($curl), LIBXML_NOERROR)->getElementById('kc-form-login')
+        ?? throw new RuntimeException('Keycloak shows no login form.');
     curl_setopt_array($curl, [
-        CURLOPT_URL => html_entity_decode($match[1]),
+        CURLOPT_URL => $form->getAttribute('action'),
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query(['username' => $username, 'password' => $password, 'credentialId' => '']),
-        CURLOPT_HEADER => true,
     ]);
-    $response = (string) curl_exec($curl);
-    if (1 !== preg_match('/^Location: (\S+)/mi', $response, $location)) {
-        throw new RuntimeException('Login did not redirect: ' . substr($response, 0, 300));
-    }
-    parse_str((string) parse_url($location[1], PHP_URL_QUERY), $query);
-    curl_close($curl);
+    curl_exec($curl);
+    $location = curl_getinfo($curl, CURLINFO_REDIRECT_URL) ?: throw new RuntimeException('The login did not redirect.');
+    parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
 
     return $query;
 }
@@ -85,7 +82,7 @@ $client = new KeycloakClient(
     $factory,
     $factory
 );
-echo 'PHP ' . PHP_VERSION . ' with ' . get_class(httpClient()) . "\n";
+echo 'PHP ' . PHP_VERSION . ' with ' . httpClient()::class . "\n";
 
 $flow = new LoginFlow($client, new NativeSessionStateStore(), [new EmailDomainPolicy(['example.com'])]);
 
@@ -129,7 +126,7 @@ try {
     $client->verifyAccessToken((string) $result->getTokens()->getIdToken(), 'app');
     check(false, 'ID token rejected as bearer token');
 } catch (InvalidTokenException $exception) {
-    check(false !== strpos($exception->getMessage(), 'type'), 'ID token rejected as bearer token');
+    check(str_contains($exception->getMessage(), 'type'), 'ID token rejected as bearer token');
 }
 
 // Refresh and userinfo
@@ -139,23 +136,23 @@ check('jane.doe@example.com' === $client->getUserInfo($refreshed->getAccessToken
 
 // Directory through the service account
 $users = [];
-foreach ((new UserDirectory($client))->users() as $user) {
+foreach (new UserDirectory($client)->users() as $user) {
     $users[$user->getUsername()] = $user;
 }
 check(isset($users['jdoe']) && $users['jdoe']->getId() === $identity->getSubject(), 'directory lists jdoe with the token subject as id');
-check(['/staff/it'] === (new UserDirectory($client))->groupsOf($identity->getSubject()), 'directory reads group paths');
-check(null === (new UserDirectory($client))->find('00000000-0000-0000-0000-000000000000'), 'directory returns null for unknown ids');
+check(['/staff/it'] === new UserDirectory($client)->groupsOf($identity->getSubject()), 'directory reads group paths');
+check(null === new UserDirectory($client)->find('00000000-0000-0000-0000-000000000000'), 'directory returns null for unknown ids');
 
 // RP-initiated logout ends the Keycloak session
 $logoutUrl = (string) $client->getLogoutUrl('http://app.test/', $refreshed->getIdToken());
 $curl = curl_init($logoutUrl);
-curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true]);
-$response = (string) curl_exec($curl);
-check(1 === preg_match('~^Location: http://app\.test/~mi', $response), 'logout redirects back to the application');
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_exec($curl);
+check(str_starts_with((string) curl_getinfo($curl, CURLINFO_REDIRECT_URL), 'http://app.test/'), 'logout redirects back to the application');
 try {
     $client->refresh((string) $refreshed->getRefreshToken());
     check(false, 'refresh token is dead after logout');
-} catch (Bannerstop\Keycloak\Exception\HttpException $exception) {
+} catch (HttpException $exception) {
     check(400 === $exception->getStatusCode(), 'refresh token is dead after logout');
 }
 

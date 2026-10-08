@@ -13,6 +13,7 @@ use Bannerstop\Keycloak\Policy\EmailDomainPolicy;
 use Bannerstop\Keycloak\Role\RoleMapper;
 use Bannerstop\Keycloak\Token\Claims;
 use Bannerstop\Keycloak\Token\TokenSet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BuildingBlocksTest extends TestCase
@@ -40,10 +41,9 @@ final class BuildingBlocksTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidConfigs
-     *
      * @param array<string, mixed> $options
      */
+    #[DataProvider('invalidConfigs')]
     public function testConfigRejectsInvalidValues(array $options): void
     {
         $this->expectException(ConfigurationException::class);
@@ -54,7 +54,7 @@ final class BuildingBlocksTest extends TestCase
     /**
      * @return array<string, array<int, array<string, mixed>>>
      */
-    public function invalidConfigs(): array
+    public static function invalidConfigs(): array
     {
         return [
             'relative server url' => [['server_url' => 'sso.example.com']],
@@ -121,20 +121,18 @@ final class BuildingBlocksTest extends TestCase
         self::assertFalse($policy->allows($identity('jane@example.com.evil.test', true)), 'suffix');
         self::assertFalse($policy->allows($identity('example.com', true)), 'no @');
         self::assertFalse($policy->allows(new Identity(new Claims(['sub' => 'u', 'email_verified' => true]))), 'no e-mail');
-        self::assertTrue((new EmailDomainPolicy(['example.com'], false))->allows($identity('jane@example.com', false)));
+        self::assertTrue(new EmailDomainPolicy(['example.com'], false)->allows($identity('jane@example.com', false)));
     }
 
     public function testIdentityDisplayNameFallbacks(): void
     {
-        self::assertSame('Jane Doe', (new Identity(new Claims(['sub' => 'u', 'given_name' => 'Jane', 'family_name' => 'Doe'])))->getDisplayName());
-        self::assertSame('jdoe', (new Identity(new Claims(['sub' => 'u', 'preferred_username' => 'jdoe'])))->getDisplayName());
-        self::assertSame('u', (new Identity(new Claims(['sub' => 'u'])))->getDisplayName());
-        self::assertSame('Jane 0', (new Identity(new Claims(['sub' => 'u', 'given_name' => 'Jane', 'family_name' => '0'])))->getDisplayName());
+        self::assertSame('Jane Doe', new Identity(new Claims(['sub' => 'u', 'given_name' => 'Jane', 'family_name' => 'Doe']))->getDisplayName());
+        self::assertSame('jdoe', new Identity(new Claims(['sub' => 'u', 'preferred_username' => 'jdoe']))->getDisplayName());
+        self::assertSame('u', new Identity(new Claims(['sub' => 'u']))->getDisplayName());
+        self::assertSame('Jane 0', new Identity(new Claims(['sub' => 'u', 'given_name' => 'Jane', 'family_name' => '0']))->getDisplayName());
     }
 
-    /**
-     * @dataProvider redirectTargets
-     */
+    #[DataProvider('redirectTargets')]
     public function testRedirectTargets(?string $target, bool $local): void
     {
         self::assertSame($local, RedirectTarget::isLocal($target));
@@ -143,7 +141,7 @@ final class BuildingBlocksTest extends TestCase
     /**
      * @return array<string, array{0: string|null, 1: bool}>
      */
-    public function redirectTargets(): array
+    public static function redirectTargets(): array
     {
         return [
             'path' => ['/orders?page=2#top', true],
