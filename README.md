@@ -25,6 +25,7 @@ Composer does this for you with a `*` or a wide constraint.
 | Version | PHP     |
 |---------|---------|
 | 1.x     | ≥ 7.1.3 |
+| 2.x     | ≥ 7.2   |
 
 ## Installation
 

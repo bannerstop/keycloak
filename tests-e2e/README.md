@@ -12,7 +12,7 @@ docker run -d --name kc-e2e --network kc-e2e --network-alias keycloak \
   quay.io/keycloak/keycloak:26.4 start-dev --import-realm
 
 composer install
-composer require symfony/http-client   # or php-http/guzzle6-adapter on PHP 7.1
+composer require symfony/http-client   # or php-http/guzzle6-adapter with Guzzle 6
 docker run --rm --network kc-e2e -v "$PWD:/app" -w /app php:8.4-cli php run.php
 ```
 

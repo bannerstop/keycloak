@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 2.0.0
+
+- Requires PHP 7.2 or later. The API is unchanged; the major version marks the
+  new PHP range (see UPGRADE.md).
+
 ## 1.0.0
 
 First release, PHP 7.1.3 and later.
