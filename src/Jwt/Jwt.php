@@ -14,7 +14,7 @@ use Bannerstop\Keycloak\Support\Base64Url;
  */
 final class Jwt
 {
-    private const MAX_LENGTH = 65536;
+    private const int MAX_LENGTH = 65536;
 
     /**
      * @param array<mixed> $header

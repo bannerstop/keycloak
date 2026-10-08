@@ -11,8 +11,8 @@ use Bannerstop\Keycloak\Support\Base64Url;
  */
 final readonly class JsonWebKey
 {
-    private const MIN_RSA_BITS = 2048;
-    private const CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
+    private const int MIN_RSA_BITS = 2048;
+    private const array CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
 
     private function __construct(
         private ?string $keyId,

@@ -12,14 +12,14 @@ namespace Bannerstop\Keycloak\Jwt;
  */
 final class Der
 {
-    private const OID_RSA_ENCRYPTION = "\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01";
-    private const OID_EC_PUBLIC_KEY = "\x06\x07\x2a\x86\x48\xce\x3d\x02\x01";
-    private const OID_CURVES = [
+    private const string OID_RSA_ENCRYPTION = "\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01";
+    private const string OID_EC_PUBLIC_KEY = "\x06\x07\x2a\x86\x48\xce\x3d\x02\x01";
+    private const array OID_CURVES = [
         'P-256' => "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07",
         'P-384' => "\x06\x05\x2b\x81\x04\x00\x22",
         'P-521' => "\x06\x05\x2b\x81\x04\x00\x23",
     ];
-    private const ASN1_NULL = "\x05\x00";
+    private const string ASN1_NULL = "\x05\x00";
 
     private function __construct()
     {

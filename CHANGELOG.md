@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 8.0.0
+
+- Requires PHP 8.3 or later.
+- Typed class constants and `#[\Override]` on every implemented interface
+  method.
+
 ## 7.0.0
 
 - Requires PHP 8.2 or later.

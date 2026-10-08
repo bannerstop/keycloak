@@ -17,8 +17,8 @@ use Psr\Clock\ClockInterface;
 final readonly class TokenVerifier
 {
     /** Keycloak marks ID tokens with typ "ID" and access tokens with typ "Bearer". */
-    private const TYPE_ID = 'ID';
-    private const TYPE_ACCESS = 'Bearer';
+    private const string TYPE_ID = 'ID';
+    private const string TYPE_ACCESS = 'Bearer';
     private ClockInterface $clock;
 
     public function __construct(

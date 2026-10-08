@@ -31,6 +31,7 @@ Composer does this for you with a `*` or a wide constraint.
 | 5.x     | ≥ 8.0   |
 | 6.x     | ≥ 8.1   |
 | 7.x     | ≥ 8.2   |
+| 8.x     | ≥ 8.3   |
 
 ## Installation
 

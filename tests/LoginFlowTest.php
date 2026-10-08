@@ -16,11 +16,12 @@ use Psr\Http\Message\RequestInterface;
 
 final class LoginFlowTest extends TestCase
 {
-    private const CALLBACK = 'https://app.example.com/login/callback';
+    private const string CALLBACK = 'https://app.example.com/login/callback';
 
     private FakeKeycloak $realm;
     private StateStore $store;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->realm = new FakeKeycloak();
@@ -28,11 +29,13 @@ final class LoginFlowTest extends TestCase
             /** @var array<string, PendingLogin> */
             public array $logins = [];
 
+            #[\Override]
             public function save(PendingLogin $login): void
             {
                 $this->logins[$login->getState()] = $login;
             }
 
+            #[\Override]
             public function take(string $state): ?PendingLogin
             {
                 $login = $this->logins[$state] ?? null;

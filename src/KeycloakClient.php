@@ -29,7 +29,7 @@ use Psr\SimpleCache\CacheInterface;
 class KeycloakClient
 {
     /** Parameters an application may add to the authorization request. */
-    private const AUTHORIZATION_PARAMETERS = ['prompt', 'login_hint', 'kc_idp_hint', 'ui_locales', 'max_age', 'acr_values', 'kc_action'];
+    private const array AUTHORIZATION_PARAMETERS = ['prompt', 'login_hint', 'kc_idp_hint', 'ui_locales', 'max_age', 'acr_values', 'kc_action'];
 
     private readonly JsonHttpClient $http;
     private readonly MetadataProvider $metadata;

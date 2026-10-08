@@ -10,13 +10,14 @@ namespace Bannerstop\Keycloak\Login;
  */
 final readonly class NativeSessionStateStore implements StateStore
 {
-    private const MAX_PENDING = 5;
+    private const int MAX_PENDING = 5;
 
     public function __construct(
         private string $sessionKey = '_bannerstop_keycloak_logins',
     ) {
     }
 
+    #[\Override]
     public function save(PendingLogin $login): void
     {
         $pending = $this->all();
@@ -25,6 +26,7 @@ final readonly class NativeSessionStateStore implements StateStore
         $_SESSION[$this->sessionKey] = array_slice($pending, -self::MAX_PENDING, null, true);
     }
 
+    #[\Override]
     public function take(string $state): ?PendingLogin
     {
         $pending = $this->all();

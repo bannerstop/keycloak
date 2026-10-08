@@ -19,7 +19,7 @@ use Psr\Clock\ClockInterface;
  */
 final readonly class KeySetProvider
 {
-    private const MIN_REFRESH_INTERVAL = 60;
+    private const int MIN_REFRESH_INTERVAL = 60;
     private ClockInterface $clock;
 
     public function __construct(

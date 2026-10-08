@@ -13,6 +13,7 @@ final class FrozenClock implements ClockInterface
     ) {
     }
 
+    #[\Override]
     public function now(): \DateTimeImmutable
     {
         return new \DateTimeImmutable('@' . $this->time);

@@ -11,7 +11,7 @@ use Bannerstop\Keycloak\Support\Base64Url;
  */
 final class TestKey
 {
-    private const EC_SIZES = ['prime256v1' => 32, 'secp384r1' => 48, 'secp521r1' => 66];
+    private const array EC_SIZES = ['prime256v1' => 32, 'secp384r1' => 48, 'secp521r1' => 66];
 
     /**
      * @param resource|\OpenSSLAsymmetricKey $privateKey

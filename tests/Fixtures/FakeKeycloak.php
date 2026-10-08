@@ -14,11 +14,11 @@ use Nyholm\Psr7\Factory\Psr17Factory;
  */
 final class FakeKeycloak
 {
-    public const SERVER = 'https://sso.example.com';
-    public const ISSUER = 'https://sso.example.com/realms/example';
-    public const TOKEN_ENDPOINT = self::ISSUER . '/protocol/openid-connect/token';
-    public const JWKS_URI = self::ISSUER . '/protocol/openid-connect/certs';
-    public const NOW = 1750000000;
+    public const string SERVER = 'https://sso.example.com';
+    public const string ISSUER = 'https://sso.example.com/realms/example';
+    public const string TOKEN_ENDPOINT = self::ISSUER . '/protocol/openid-connect/token';
+    public const string JWKS_URI = self::ISSUER . '/protocol/openid-connect/certs';
+    public const int NOW = 1750000000;
 
     public FakeHttpClient $http;
     public FrozenClock $clock;

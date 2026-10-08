@@ -14,7 +14,7 @@ use Bannerstop\Keycloak\KeycloakClient;
  */
 final readonly class UserDirectory
 {
-    private const PAGE_SIZE = 100;
+    private const int PAGE_SIZE = 100;
 
     public function __construct(
         private KeycloakClient $client,

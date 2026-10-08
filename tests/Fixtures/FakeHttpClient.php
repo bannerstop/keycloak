@@ -27,6 +27,7 @@ final class FakeHttpClient implements ClientInterface
         return $this;
     }
 
+    #[\Override]
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         $this->requests[] = $request;

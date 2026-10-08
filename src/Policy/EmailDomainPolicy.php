@@ -37,6 +37,7 @@ final readonly class EmailDomainPolicy implements IdentityPolicy
         $this->domains = $normalized;
     }
 
+    #[\Override]
     public function allows(Identity $identity): bool
     {
         if ($this->requireVerified && !$identity->isEmailVerified()) {
