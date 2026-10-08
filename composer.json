@@ -2,7 +2,15 @@
     "name": "bannerstop/keycloak",
     "description": "Framework-agnostic Keycloak / OpenID Connect client: login with PKCE, logout, token verification against JWKS, role mapping and the admin user directory",
     "type": "library",
-    "keywords": ["keycloak", "openid-connect", "oidc", "oauth2", "sso", "jwt", "pkce"],
+    "keywords": [
+        "keycloak",
+        "openid-connect",
+        "oidc",
+        "oauth2",
+        "sso",
+        "jwt",
+        "pkce"
+    ],
     "license": "MIT",
     "authors": [
         {
