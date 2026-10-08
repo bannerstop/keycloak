@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 10.0.1
+
+- Security: the login callback is checked against mix-up attacks (RFC 9207).
+  A callback whose `iss` parameter names another issuer is rejected, and so is
+  a callback without `iss` if the provider announces that it always sends one
+  (`authorization_response_iss_parameter_supported`, which Keycloak does).
+  Both fail with `LoginFailure::ProviderError` before the code is redeemed.
+
 ## 10.0.0
 
 - Requires PHP 8.5 or later.
