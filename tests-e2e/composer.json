@@ -3,7 +3,19 @@
     "type": "project",
     "require": {
         "bannerstop/keycloak": "*",
-        "nyholm/psr7": "^1.4"
+        "nyholm/psr7": "^1.4",
+        "symfony/cache": "^7.4 || ^8.0"
     },
-    "repositories": [{ "type": "path", "url": "..", "options": { "symlink": false, "versions": { "bannerstop/keycloak": "1.0.0" } } }]
+    "repositories": [
+        {
+            "type": "path",
+            "url": "..",
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "bannerstop/keycloak": "1.0.0"
+                }
+            }
+        }
+    ]
 }
