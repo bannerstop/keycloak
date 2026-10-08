@@ -9,23 +9,15 @@ namespace Bannerstop\Keycloak\Admin;
  */
 final class DirectoryUser
 {
-    private string $id;
-    private string $username;
-    private ?string $email;
-    private ?string $firstName;
-    private ?string $lastName;
-    private bool $enabled;
-    private bool $emailVerified;
-
-    public function __construct(string $id, string $username, ?string $email, ?string $firstName, ?string $lastName, bool $enabled, bool $emailVerified)
-    {
-        $this->id = $id;
-        $this->username = $username;
-        $this->email = $email;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->enabled = $enabled;
-        $this->emailVerified = $emailVerified;
+    public function __construct(
+        private string $id,
+        private string $username,
+        private ?string $email,
+        private ?string $firstName,
+        private ?string $lastName,
+        private bool $enabled,
+        private bool $emailVerified,
+    ) {
     }
 
     /**
@@ -33,7 +25,7 @@ final class DirectoryUser
      */
     public static function fromArray(array $representation): ?self
     {
-        $string = (static fn (string $field): ?string => isset($representation[$field]) && is_string($representation[$field]) && '' !== trim($representation[$field]) ? trim($representation[$field]) : null);
+        $string = static fn (string $field): ?string => isset($representation[$field]) && is_string($representation[$field]) && '' !== trim($representation[$field]) ? trim($representation[$field]) : null;
         $id = $string('id');
         $username = $string('username');
         if (null === $id || null === $username) {

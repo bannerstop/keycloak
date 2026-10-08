@@ -44,7 +44,7 @@ final class KeycloakConfig
         array $scopes = ['openid', 'email', 'profile'],
         array $allowedAlgorithms = [Algorithm::RS256],
         int $leeway = 30,
-        int $metadataTtl = 3600
+        int $metadataTtl = 3600,
     ) {
         $serverUrl = rtrim($serverUrl, '/');
         $scheme = parse_url($serverUrl, PHP_URL_SCHEME);

@@ -14,21 +14,15 @@ final class JsonWebKey
     private const MIN_RSA_BITS = 2048;
     private const CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
 
-    private ?string $keyId;
-    private string $keyType;
-    private ?string $algorithm;
-    private ?string $curve;
-
-    /** @var string PEM for RSA and EC, the raw 32 byte public key for Ed25519 */
-    private string $material;
-
-    private function __construct(?string $keyId, string $keyType, ?string $algorithm, ?string $curve, string $material)
+    private function __construct(
+        private ?string $keyId,
+        private string $keyType,
+        private ?string $algorithm,
+        private ?string $curve,
+        /** @var string PEM for RSA and EC, the raw 32 byte public key for Ed25519 */
+        private string $material
+    )
     {
-        $this->keyId = $keyId;
-        $this->keyType = $keyType;
-        $this->algorithm = $algorithm;
-        $this->curve = $curve;
-        $this->material = $material;
     }
 
     /**
@@ -50,38 +44,55 @@ final class JsonWebKey
             return null;
         }
 
-        switch ($keyType) {
-            case 'RSA':
-                $modulus = self::binaryParameter($jwk, 'n');
-                $exponent = self::binaryParameter($jwk, 'e');
-                if (null === $modulus || null === $exponent || 8 * strlen(ltrim($modulus, "\x00")) < self::MIN_RSA_BITS) {
-                    return null;
-                }
+        return match ($keyType) {
+            'RSA' => self::rsa($jwk, $keyId, $algorithm),
+            'EC' => self::ec($jwk, $keyId, $algorithm),
+            'OKP' => self::okp($jwk, $keyId, $algorithm),
+            default => null,
+        };
+    }
 
-                return new self($keyId, $keyType, $algorithm, null, Der::rsaPublicKeyPem($modulus, $exponent));
-
-            case 'EC':
-                $curve = self::stringParameter($jwk, 'crv');
-                $x = self::binaryParameter($jwk, 'x');
-                $y = self::binaryParameter($jwk, 'y');
-                if (null === $curve || 'Ed25519' === $curve || !isset(self::CURVE_SIZES[$curve]) || null === $x || null === $y
-                    || strlen($x) !== self::CURVE_SIZES[$curve] || strlen($y) !== self::CURVE_SIZES[$curve]) {
-                    return null;
-                }
-
-                return new self($keyId, $keyType, $algorithm, $curve, Der::ecPublicKeyPem($curve, $x, $y));
-
-            case 'OKP':
-                $curve = self::stringParameter($jwk, 'crv');
-                $x = self::binaryParameter($jwk, 'x');
-                if ('Ed25519' !== $curve || null === $x || strlen($x) !== self::CURVE_SIZES['Ed25519']) {
-                    return null;
-                }
-
-                return new self($keyId, $keyType, $algorithm, $curve, $x);
+    /**
+     * @param array<mixed> $jwk
+     */
+    private static function rsa(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    {
+        $modulus = self::binaryParameter($jwk, 'n');
+        $exponent = self::binaryParameter($jwk, 'e');
+        if (null === $modulus || null === $exponent || 8 * strlen(ltrim($modulus, "\x00")) < self::MIN_RSA_BITS) {
+            return null;
         }
 
-        return null;
+        return new self($keyId, 'RSA', $algorithm, null, Der::rsaPublicKeyPem($modulus, $exponent));
+    }
+
+    /**
+     * @param array<mixed> $jwk
+     */
+    private static function ec(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    {
+        $curve = self::stringParameter($jwk, 'crv');
+        $x = self::binaryParameter($jwk, 'x');
+        $y = self::binaryParameter($jwk, 'y');
+        $size = self::CURVE_SIZES[$curve ?? ''] ?? null;
+        if ('Ed25519' === $curve || null === $size || null === $x || null === $y || strlen($x) !== $size || strlen($y) !== $size) {
+            return null;
+        }
+
+        return new self($keyId, 'EC', $algorithm, $curve, Der::ecPublicKeyPem((string) $curve, $x, $y));
+    }
+
+    /**
+     * @param array<mixed> $jwk
+     */
+    private static function okp(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    {
+        $x = self::binaryParameter($jwk, 'x');
+        if ('Ed25519' !== self::stringParameter($jwk, 'crv') || null === $x || strlen($x) !== self::CURVE_SIZES['Ed25519']) {
+            return null;
+        }
+
+        return new self($keyId, 'OKP', $algorithm, 'Ed25519', $x);
     }
 
     public function getKeyId(): ?string

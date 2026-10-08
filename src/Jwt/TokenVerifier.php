@@ -19,15 +19,13 @@ final class TokenVerifier
     /** Keycloak marks ID tokens with typ "ID" and access tokens with typ "Bearer". */
     private const TYPE_ID = 'ID';
     private const TYPE_ACCESS = 'Bearer';
-
-    private KeycloakConfig $config;
-    private KeySetProvider $keys;
     private ClockInterface $clock;
 
-    public function __construct(KeycloakConfig $config, KeySetProvider $keys, ClockInterface $clock)
-    {
-        $this->config = $config;
-        $this->keys = $keys;
+    public function __construct(
+        private KeycloakConfig $config,
+        private KeySetProvider $keys,
+        ClockInterface $clock,
+    ) {
         $this->clock = $clock;
     }
 

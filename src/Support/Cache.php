@@ -17,20 +17,15 @@ use Psr\SimpleCache\InvalidArgumentException;
  */
 final class Cache
 {
-    private ?CacheInterface $cache;
-
     /** @var array<string, mixed> */
     private array $memory = [];
 
-    public function __construct(?CacheInterface $cache = null)
-    {
-        $this->cache = $cache;
+    public function __construct(
+        private ?CacheInterface $cache = null,
+    ) {
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if (array_key_exists($key, $this->memory)) {
             return $this->memory[$key];
@@ -40,7 +35,7 @@ final class Cache
         }
         try {
             $value = $this->cache->get($key);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             return null;
         }
         if (null !== $value) {
@@ -50,10 +45,7 @@ final class Cache
         return $value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function set(string $key, $value, int $ttl): void
+    public function set(string $key, mixed $value, int $ttl): void
     {
         $this->memory[$key] = $value;
         if (null === $this->cache) {
@@ -61,7 +53,7 @@ final class Cache
         }
         try {
             $this->cache->set($key, $value, $ttl);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
         }
     }
 
@@ -73,7 +65,7 @@ final class Cache
         }
         try {
             $this->cache->delete($key);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
         }
     }
 }

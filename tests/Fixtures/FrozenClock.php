@@ -8,11 +8,9 @@ use Psr\Clock\ClockInterface;
 
 final class FrozenClock implements ClockInterface
 {
-    public int $time;
-
-    public function __construct(int $time)
-    {
-        $this->time = $time;
+    public function __construct(
+        public int $time,
+    ) {
     }
 
     public function now(): \DateTimeImmutable

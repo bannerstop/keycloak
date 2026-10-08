@@ -33,6 +33,9 @@ function check(bool $condition, string $what): void
 
 function httpClient(): Psr\Http\Client\ClientInterface
 {
+    if (class_exists(GuzzleHttp\Client::class) && is_subclass_of(GuzzleHttp\Client::class, Psr\Http\Client\ClientInterface::class)) {
+        return new GuzzleHttp\Client(['timeout' => 10]);
+    }
     if (class_exists(Http\Adapter\Guzzle6\Client::class)) {
         return Http\Adapter\Guzzle6\Client::createWithConfig(['timeout' => 10]);
     }

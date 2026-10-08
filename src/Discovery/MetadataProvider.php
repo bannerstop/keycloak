@@ -16,15 +16,11 @@ use Bannerstop\Keycloak\Support\Cache;
  */
 final class MetadataProvider
 {
-    private KeycloakConfig $config;
-    private JsonHttpClient $http;
-    private Cache $cache;
-
-    public function __construct(KeycloakConfig $config, JsonHttpClient $http, Cache $cache)
-    {
-        $this->config = $config;
-        $this->http = $http;
-        $this->cache = $cache;
+    public function __construct(
+        private KeycloakConfig $config,
+        private JsonHttpClient $http,
+        private Cache $cache,
+    ) {
     }
 
     public function get(): ProviderMetadata

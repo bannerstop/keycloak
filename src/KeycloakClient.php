@@ -31,7 +31,6 @@ class KeycloakClient
     /** Parameters an application may add to the authorization request. */
     private const AUTHORIZATION_PARAMETERS = ['prompt', 'login_hint', 'kc_idp_hint', 'ui_locales', 'max_age', 'acr_values', 'kc_action'];
 
-    private KeycloakConfig $config;
     private JsonHttpClient $http;
     private MetadataProvider $metadata;
     private TokenVerifier $verifier;
@@ -39,19 +38,18 @@ class KeycloakClient
     private ?TokenSet $serviceAccountTokens = null;
 
     public function __construct(
-        KeycloakConfig $config,
+        private KeycloakConfig $config,
         ClientInterface $httpClient,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         ?CacheInterface $cache = null,
-        ?ClockInterface $clock = null
+        ?ClockInterface $clock = null,
     ) {
-        $this->config = $config;
         $this->clock = $clock ?? new SystemClock();
         $this->http = new JsonHttpClient($httpClient, $requestFactory, $streamFactory);
         $cacheWrapper = new Cache($cache);
-        $this->metadata = new MetadataProvider($config, $this->http, $cacheWrapper);
-        $this->verifier = new TokenVerifier($config, new KeySetProvider($config, $this->metadata, $this->http, $cacheWrapper, $this->clock), $this->clock);
+        $this->metadata = new MetadataProvider($this->config, $this->http, $cacheWrapper);
+        $this->verifier = new TokenVerifier($this->config, new KeySetProvider($this->config, $this->metadata, $this->http, $cacheWrapper, $this->clock), $this->clock);
     }
 
     public function getConfig(): KeycloakConfig
@@ -274,7 +272,7 @@ class KeycloakClient
      */
     private static function appendQuery(string $url, array $query): string
     {
-        return $url . (false === strpos($url, '?') ? '?' : '&') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        return $url . (!str_contains($url, '?') ? '?' : '&') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
     }
 
     private static function isJwt(string $token): bool

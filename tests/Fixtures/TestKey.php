@@ -13,26 +13,17 @@ final class TestKey
 {
     private const EC_SIZES = ['prime256v1' => 32, 'secp384r1' => 48, 'secp521r1' => 66];
 
-    /** @var resource|\OpenSSLAsymmetricKey */
-    private $privateKey;
-
-    /** @var array<string, string> */
-    private array $jwk;
-    public string $algorithm;
-    public string $kid;
-    private ?int $ecSize;
-
     /**
      * @param resource|\OpenSSLAsymmetricKey $privateKey
      * @param array<string, string>          $jwk
      */
-    private function __construct($privateKey, array $jwk, string $algorithm, string $kid, ?int $ecSize = null)
-    {
-        $this->ecSize = $ecSize;
-        $this->privateKey = $privateKey;
-        $this->jwk = $jwk;
-        $this->algorithm = $algorithm;
-        $this->kid = $kid;
+    private function __construct(
+        private $privateKey,
+        private array $jwk,
+        public string $algorithm,
+        public string $kid,
+        private ?int $ecSize = null,
+    ) {
     }
 
     public static function rsa(string $kid = 'rsa-key', int $bits = 2048, string $algorithm = 'RS256'): self
@@ -50,8 +41,11 @@ final class TestKey
         ], $algorithm, $kid);
     }
 
-    public static function ec(string $curveName = 'prime256v1', string $algorithm = 'ES256', string $kid = 'ec-key'): self
-    {
+    public static function ec(
+        string $curveName = 'prime256v1',
+        string $algorithm = 'ES256',
+        string $kid = 'ec-key',
+    ): self {
         $key = openssl_pkey_new(['private_key_type' => OPENSSL_KEYTYPE_EC, 'curve_name' => $curveName]);
         $details = openssl_pkey_get_details($key);
         $size = self::EC_SIZES[$curveName];

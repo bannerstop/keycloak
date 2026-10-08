@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 5.0.0
+
+- Requires PHP 8.0 or later.
+- Constructor property promotion, `mixed`, `match`, `throw` expressions and
+  `str_contains()` throughout.
+- Multi-line parameter lists end with a trailing comma.
+
 ## 4.0.0
 
 - Requires PHP 7.4 or later.

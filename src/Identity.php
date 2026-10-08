@@ -16,12 +16,8 @@ final class Identity
 
     public function __construct(Claims $claims)
     {
-        $subject = $claims->getString('sub');
-        if (null === $subject) {
-            throw new \InvalidArgumentException('An identity needs a subject.');
-        }
         $this->claims = $claims;
-        $this->subject = $subject;
+        $this->subject = $claims->getString('sub') ?? throw new \InvalidArgumentException('An identity needs a subject.');
     }
 
     /**
@@ -122,11 +118,9 @@ final class Identity
     }
 
     /**
-     * @param mixed $value
-     *
      * @return string[]
      */
-    private static function stringList($value): array
+    private static function stringList(mixed $value): array
     {
         return (new Claims(['list' => $value]))->getStringList('list');
     }

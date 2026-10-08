@@ -15,17 +15,18 @@ final class EmailDomainPolicy implements IdentityPolicy
 {
     /** @var string[] */
     private array $domains;
-    private bool $requireVerified;
 
     /**
      * @param string[] $domains
      */
-    public function __construct(array $domains, bool $requireVerified = true)
-    {
+    public function __construct(
+        array $domains,
+        private bool $requireVerified = true,
+    ) {
         $normalized = [];
         foreach ($domains as $domain) {
             $domain = strtolower(trim((string) $domain));
-            if ('' === $domain || false !== strpos($domain, '@')) {
+            if ('' === $domain || str_contains($domain, '@')) {
                 throw new ConfigurationException(sprintf('"%s" is not an e-mail domain.', $domain));
             }
             $normalized[] = $domain;
@@ -34,7 +35,6 @@ final class EmailDomainPolicy implements IdentityPolicy
             throw new ConfigurationException('At least one e-mail domain is required.');
         }
         $this->domains = $normalized;
-        $this->requireVerified = $requireVerified;
     }
 
     public function allows(Identity $identity): bool

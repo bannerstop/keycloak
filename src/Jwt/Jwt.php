@@ -16,24 +16,16 @@ final class Jwt
 {
     private const MAX_LENGTH = 65536;
 
-    /** @var array<mixed> */
-    private array $header;
-
-    /** @var array<mixed> */
-    private array $payload;
-    private string $signingInput;
-    private string $signature;
-
     /**
      * @param array<mixed> $header
      * @param array<mixed> $payload
      */
-    private function __construct(array $header, array $payload, string $signingInput, string $signature)
-    {
-        $this->header = $header;
-        $this->payload = $payload;
-        $this->signingInput = $signingInput;
-        $this->signature = $signature;
+    private function __construct(
+        private array $header,
+        private array $payload,
+        private string $signingInput,
+        private string $signature,
+    ) {
     }
 
     public static function parse(string $token): self
@@ -103,7 +95,7 @@ final class Jwt
         }
         try {
             $data = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (\JsonException) {
             return null;
         }
 

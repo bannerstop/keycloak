@@ -30,8 +30,11 @@ final class FakeKeycloak
     /**
      * @param string[] $allowedAlgorithms
      */
-    public function __construct(?TestKey $key = null, array $allowedAlgorithms = ['RS256'], ?string $clientSecret = 'secret')
-    {
+    public function __construct(
+        ?TestKey $key = null,
+        array $allowedAlgorithms = ['RS256'],
+        ?string $clientSecret = 'secret',
+    ) {
         $this->http = new FakeHttpClient();
         $this->clock = new FrozenClock(self::NOW);
         $this->key = $key ?? self::sharedRsaKey();

@@ -11,19 +11,13 @@ use Bannerstop\Keycloak\Exception\HttpException;
  */
 final class TokenSet
 {
-    private string $accessToken;
-    private ?int $expiresAt;
-    private ?string $refreshToken;
-    private ?int $refreshExpiresAt;
-    private ?string $idToken;
-
-    public function __construct(string $accessToken, ?int $expiresAt, ?string $refreshToken = null, ?int $refreshExpiresAt = null, ?string $idToken = null)
-    {
-        $this->accessToken = $accessToken;
-        $this->expiresAt = $expiresAt;
-        $this->refreshToken = $refreshToken;
-        $this->refreshExpiresAt = $refreshExpiresAt;
-        $this->idToken = $idToken;
+    public function __construct(
+        private string $accessToken,
+        private ?int $expiresAt,
+        private ?string $refreshToken = null,
+        private ?int $refreshExpiresAt = null,
+        private ?string $idToken = null,
+    ) {
     }
 
     /**
@@ -34,8 +28,8 @@ final class TokenSet
         if (!isset($response['access_token']) || !is_string($response['access_token']) || '' === $response['access_token']) {
             throw new HttpException('The token endpoint returned no access token.');
         }
-        $lifetime = (static fn (string $field): ?int => isset($response[$field]) && is_numeric($response[$field]) && (int) $response[$field] > 0 ? $now + (int) $response[$field] : null);
-        $string = (static fn (string $field): ?string => isset($response[$field]) && is_string($response[$field]) && '' !== $response[$field] ? $response[$field] : null);
+        $lifetime = static fn (string $field): ?int => isset($response[$field]) && is_numeric($response[$field]) && (int) $response[$field] > 0 ? $now + (int) $response[$field] : null;
+        $string = static fn (string $field): ?string => isset($response[$field]) && is_string($response[$field]) && '' !== $response[$field] ? $response[$field] : null;
 
         return new self($response['access_token'], $lifetime('expires_in'), $string('refresh_token'), $lifetime('refresh_expires_in'), $string('id_token'));
     }

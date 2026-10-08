@@ -16,20 +16,14 @@ use Bannerstop\Keycloak\Policy\IdentityPolicy;
  */
 final class LoginFlow
 {
-    private KeycloakClient $client;
-    private StateStore $store;
-
-    /** @var IdentityPolicy[] */
-    private array $policies;
-
     /**
      * @param IdentityPolicy[] $policies All of them must allow an identity
      */
-    public function __construct(KeycloakClient $client, StateStore $store, array $policies = [])
-    {
-        $this->client = $client;
-        $this->store = $store;
-        $this->policies = $policies;
+    public function __construct(
+        private KeycloakClient $client,
+        private StateStore $store,
+        private array $policies = [],
+    ) {
     }
 
     /**
@@ -83,7 +77,7 @@ final class LoginFlow
 
         foreach ($this->policies as $policy) {
             if (!$policy->allows($identity)) {
-                throw new LoginException(LoginException::NOT_ALLOWED, sprintf('%s rejected the identity.', get_class($policy)));
+                throw new LoginException(LoginException::NOT_ALLOWED, sprintf('%s rejected the identity.', $policy::class));
             }
         }
 

@@ -10,15 +10,12 @@ namespace Bannerstop\Keycloak\Token;
  */
 final class Claims
 {
-    /** @var array<string, mixed> */
-    private array $claims;
-
     /**
      * @param array<string, mixed> $claims
      */
-    public function __construct(array $claims)
-    {
-        $this->claims = $claims;
+    public function __construct(
+        private array $claims,
+    ) {
     }
 
     public function has(string $name): bool
@@ -26,10 +23,7 @@ final class Claims
         return array_key_exists($name, $this->claims);
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         return $this->claims[$name] ?? null;
     }
@@ -81,10 +75,8 @@ final class Claims
      * Reads a nested object claim like realm_access.roles.
      *
      * @param string[] $path
-     *
-     * @return mixed|null
      */
-    public function getPath(array $path)
+    public function getPath(array $path): mixed
     {
         $value = $this->claims;
         foreach ($path as $segment) {

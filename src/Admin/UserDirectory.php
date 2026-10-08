@@ -16,11 +16,9 @@ final class UserDirectory
 {
     private const PAGE_SIZE = 100;
 
-    private KeycloakClient $client;
-
-    public function __construct(KeycloakClient $serviceAccountClient)
-    {
-        $this->client = $serviceAccountClient;
+    public function __construct(
+        private KeycloakClient $client,
+    ) {
     }
 
     /**

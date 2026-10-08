@@ -28,6 +28,7 @@ Composer does this for you with a `*` or a wide constraint.
 | 2.x     | ≥ 7.2   |
 | 3.x     | ≥ 7.3   |
 | 4.x     | ≥ 7.4   |
+| 5.x     | ≥ 8.0   |
 
 ## Installation
 

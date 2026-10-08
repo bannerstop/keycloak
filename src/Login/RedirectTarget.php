@@ -28,6 +28,6 @@ final class RedirectTarget
         }
         $parts = parse_url($target);
 
-        return false !== $parts && !isset($parts['scheme']) && !isset($parts['host']) && 0 !== strpos($target, '//');
+        return false !== $parts && !isset($parts['scheme']) && !isset($parts['host']) && !str_starts_with($target, '//');
     }
 }

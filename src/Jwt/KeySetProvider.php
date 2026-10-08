@@ -20,19 +20,15 @@ use Psr\Clock\ClockInterface;
 final class KeySetProvider
 {
     private const MIN_REFRESH_INTERVAL = 60;
-
-    private KeycloakConfig $config;
-    private MetadataProvider $metadata;
-    private JsonHttpClient $http;
-    private Cache $cache;
     private ClockInterface $clock;
 
-    public function __construct(KeycloakConfig $config, MetadataProvider $metadata, JsonHttpClient $http, Cache $cache, ClockInterface $clock)
-    {
-        $this->config = $config;
-        $this->metadata = $metadata;
-        $this->http = $http;
-        $this->cache = $cache;
+    public function __construct(
+        private KeycloakConfig $config,
+        private MetadataProvider $metadata,
+        private JsonHttpClient $http,
+        private Cache $cache,
+        ClockInterface $clock,
+    ) {
         $this->clock = $clock;
     }
 

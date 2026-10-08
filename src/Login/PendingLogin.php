@@ -13,21 +13,14 @@ use Bannerstop\Keycloak\Support\Base64Url;
  */
 final class PendingLogin
 {
-    private string $state;
-    private string $nonce;
-    private string $codeVerifier;
-    private string $redirectUri;
-    private ?string $returnTo;
-    private int $expiresAt;
-
-    public function __construct(string $state, string $nonce, string $codeVerifier, string $redirectUri, ?string $returnTo, int $expiresAt)
-    {
-        $this->state = $state;
-        $this->nonce = $nonce;
-        $this->codeVerifier = $codeVerifier;
-        $this->redirectUri = $redirectUri;
-        $this->returnTo = $returnTo;
-        $this->expiresAt = $expiresAt;
+    public function __construct(
+        private string $state,
+        private string $nonce,
+        private string $codeVerifier,
+        private string $redirectUri,
+        private ?string $returnTo,
+        private int $expiresAt,
+    ) {
     }
 
     /**

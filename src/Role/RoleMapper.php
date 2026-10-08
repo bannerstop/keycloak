@@ -114,11 +114,9 @@ final class RoleMapper
     }
 
     /**
-     * @param mixed $value
-     *
      * @return array<mixed>
      */
-    private static function table($value, string $option): array
+    private static function table(mixed $value, string $option): array
     {
         if (!is_array($value)) {
             throw new ConfigurationException(sprintf('The role mapping "%s" must be a map.', $option));
@@ -128,11 +126,9 @@ final class RoleMapper
     }
 
     /**
-     * @param mixed $value
-     *
      * @return string[]
      */
-    private static function roleList($value, string $option): array
+    private static function roleList(mixed $value, string $option): array
     {
         $roles = is_string($value) ? [$value] : $value;
         if (!is_array($roles)) {

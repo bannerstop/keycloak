@@ -22,8 +22,11 @@ final class JsonHttpClient
     private RequestFactoryInterface $requestFactory;
     private StreamFactoryInterface $streamFactory;
 
-    public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory)
-    {
+    public function __construct(
+        ClientInterface $client,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory,
+    ) {
         $this->client = $client;
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
@@ -37,7 +40,7 @@ final class JsonHttpClient
     public function get(string $url, array $query = [], ?string $bearerToken = null): array
     {
         if ([] !== $query) {
-            $url .= (false === strpos($url, '?') ? '?' : '&') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+            $url .= (!str_contains($url, '?') ? '?' : '&') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
         }
         $request = $this->requestFactory->createRequest('GET', $url)->withHeader('Accept', 'application/json');
         if (null !== $bearerToken) {
@@ -54,8 +57,12 @@ final class JsonHttpClient
      *
      * @return array<mixed>
      */
-    public function postForm(string $url, array $fields, ?string $basicUser = null, ?string $basicPassword = null): array
-    {
+    public function postForm(
+        string $url,
+        array $fields,
+        ?string $basicUser = null,
+        ?string $basicPassword = null,
+    ): array {
         $request = $this->requestFactory->createRequest('POST', $url)
             ->withHeader('Accept', 'application/json')
             ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -84,7 +91,7 @@ final class JsonHttpClient
         $status = $response->getStatusCode();
         try {
             $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (\JsonException) {
             $data = null;
         }
         if ($status < 200 || $status >= 300) {
