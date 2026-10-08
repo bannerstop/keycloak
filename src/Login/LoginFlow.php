@@ -61,6 +61,7 @@ final class LoginFlow
         if (null === $login || $login->isExpired($this->client->now())) {
             throw new LoginException(LoginException::STATE_MISMATCH, 'The callback does not match a pending login.');
         }
+        $this->checkIssuer($query);
 
         $error = self::parameter($query, 'error');
         if (null !== $error) {
@@ -88,6 +89,31 @@ final class LoginFlow
         }
 
         return new LoginResult($identity, $tokens, $login->getReturnTo());
+    }
+
+    /**
+     * Against mix-up attacks (RFC 9207): the callback must name the issuer of
+     * this client's realm, and must name one at all if the provider says it
+     * always does. Applies to error responses too.
+     *
+     * @param array<string, mixed> $query
+     *
+     * @throws LoginException
+     */
+    private function checkIssuer(array $query): void
+    {
+        try {
+            $required = $this->client->getMetadata()->isIssuerParameterSupported();
+        } catch (HttpException $exception) {
+            throw new LoginException(LoginException::PROVIDER_ERROR, 'The discovery document is unavailable: ' . $exception->getMessage(), $exception);
+        }
+        $issuer = self::parameter($query, 'iss');
+        if (null === $issuer && $required) {
+            throw new LoginException(LoginException::PROVIDER_ERROR, 'The callback names no issuer, although the provider always sends one (RFC 9207).');
+        }
+        if (null !== $issuer && $issuer !== $this->client->getConfig()->getIssuer()) {
+            throw new LoginException(LoginException::PROVIDER_ERROR, 'The callback was issued by another provider (RFC 9207).');
+        }
     }
 
     /**
