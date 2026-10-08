@@ -2,7 +2,15 @@
     "name": "bannerstop/keycloak",
     "description": "Framework-agnostic Keycloak / OpenID Connect client: login with PKCE, logout, token verification against JWKS, role mapping and the admin user directory",
     "type": "library",
-    "keywords": ["keycloak", "openid-connect", "oidc", "oauth2", "sso", "jwt", "pkce"],
+    "keywords": [
+        "keycloak",
+        "openid-connect",
+        "oidc",
+        "oauth2",
+        "sso",
+        "jwt",
+        "pkce"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -22,7 +30,8 @@
     },
     "require-dev": {
         "nyholm/psr7": "^1.4",
-        "phpunit/phpunit": "^7.5.20 || ^8.5.21 || ^9.6"
+        "phpunit/phpunit": "^7.5.20 || ^8.5.21 || ^9.6",
+        "symfony/cache": "^4.4 || ^5.4 || ^6.0 || ^7.0 || ^8.0"
     },
     "suggest": {
         "ext-sodium": "To verify EdDSA (Ed25519) signed tokens",

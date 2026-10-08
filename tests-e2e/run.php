@@ -16,7 +16,12 @@ use Bannerstop\Keycloak\Login\LoginFlow;
 use Bannerstop\Keycloak\Login\NativeSessionStateStore;
 use Bannerstop\Keycloak\Policy\EmailDomainPolicy;
 use Bannerstop\Keycloak\Role\RoleMapper;
+use Bannerstop\Keycloak\Session\KeycloakSession;
+use Bannerstop\Keycloak\Session\SessionCheck;
+use Bannerstop\Keycloak\Session\SessionRevocations;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -172,5 +177,68 @@ try {
 } catch (LoginException $exception) {
     check(LoginException::NOT_ALLOWED === $exception->getReason(), 'policy rejects other e-mail domains');
 }
+
+// Back-channel logout: Keycloak tells the application that a session ended elsewhere
+/**
+ * @param array<string, mixed>|null $body
+ *
+ * @return mixed
+ */
+function adminApi(string $server, string $method, string $path, ?array $body = null)
+{
+    static $token;
+    if (null === $token) {
+        $curl = curl_init($server . '/realms/master/protocol/openid-connect/token');
+        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POSTFIELDS => http_build_query(['grant_type' => 'password', 'client_id' => 'admin-cli', 'username' => 'admin', 'password' => 'admin'])]);
+        $token = json_decode((string) curl_exec($curl), true)['access_token'];
+    }
+    $curl = curl_init($server . '/admin/realms/example' . $path);
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => null === $body ? '' : json_encode($body),
+    ]);
+    $response = (string) curl_exec($curl);
+    $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    if ($status >= 300) {
+        throw new RuntimeException(sprintf('%s %s returned HTTP %d.', $method, $path, $status));
+    }
+
+    return json_decode($response, true);
+}
+
+$backchannelServer = proc_open(escapeshellarg(PHP_BINARY) . ' -S 0.0.0.0:8000 ' . escapeshellarg(__DIR__ . '/backchannel.php'), [1 => ['file', '/dev/null', 'w'], 2 => ['file', sys_get_temp_dir() . '/backchannel.log', 'w']], $pipes, __DIR__);
+register_shutdown_function(static function () use ($backchannelServer) {
+    proc_terminate($backchannelServer);
+});
+$appClient = adminApi($server, 'GET', '/clients?clientId=app')[0];
+adminApi($server, 'PUT', '/clients/' . $appClient['id'], ['clientId' => 'app', 'attributes' => [
+    'backchannel.logout.url' => getenv('BACKCHANNEL_URL') ?: 'http://e2e-app:8000/',
+    'backchannel.logout.session.required' => 'true',
+]]);
+
+$revocations = new SessionRevocations(new Psr16Cache(new FilesystemAdapter('revocations', 0, sys_get_temp_dir() . '/keycloak-e2e')), 3600);
+
+$backchannelFlow = new LoginFlow($client, new NativeSessionStateStore());
+$login = $backchannelFlow->finish(browserLogin($backchannelFlow->start($callback), 'jdoe', 'jane-password'));
+$session = KeycloakSession::fromLogin($login, $client->now());
+check(null !== $session->getSessionId(), 'the ID token names the Keycloak session (sid)');
+check(null !== (new SessionCheck($client, $revocations))->check($session), 'a fresh session passes the check');
+
+adminApi($server, 'DELETE', '/sessions/' . $session->getSessionId());
+for ($waited = 0; $waited < 50 && !$revocations->isRevoked($session); ++$waited) {
+    usleep(100000);
+}
+check(null === (new SessionCheck($client, $revocations))->check($session), 'a session ended in Keycloak ends through the back channel');
+
+// Refresh check: without the back channel, the next refresh tells that the Keycloak session is gone
+$login = $backchannelFlow->finish(browserLogin($backchannelFlow->start($callback), 'jdoe', 'jane-password'));
+$session = KeycloakSession::fromLogin($login, $client->now() - 120);
+$refreshCheck = new SessionCheck($client, null, 60);
+$session = $refreshCheck->check($session);
+check(null !== $session && $session->getCheckedAt() >= $client->now() - 5, 'the refresh check renews a live session');
+adminApi($server, 'DELETE', '/sessions/' . $session->getSessionId());
+check(null === $refreshCheck->check($session->withCheckedAt($client->now() - 120)), 'the refresh check ends a session Keycloak ended');
 
 echo "all checks passed\n";

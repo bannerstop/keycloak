@@ -83,7 +83,7 @@ final class ProviderMetadata
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array<string, string|bool|null>
      */
     public function toArray(): array
     {
