@@ -15,6 +15,7 @@ use Bannerstop\Keycloak\Login\PendingLogin;
 use Bannerstop\Keycloak\Support\Cache;
 use Bannerstop\Keycloak\Support\SystemClock;
 use Bannerstop\Keycloak\Token\Claims;
+use Bannerstop\Keycloak\Token\LogoutToken;
 use Bannerstop\Keycloak\Token\TokenSet;
 use Psr\Clock\ClockInterface;
 use Psr\Http\Client\ClientInterface;
@@ -162,6 +163,19 @@ class KeycloakClient
     public function verifyAccessToken(#[\SensitiveParameter] string $accessToken, ?string $audience = null): Identity
     {
         return new Identity($this->verifier->verifyAccessToken($accessToken, $audience ?? $this->config->getClientId()));
+    }
+
+    /**
+     * Verifies the logout token of a back-channel logout request (the
+     * "logout_token" form field Keycloak posts to the client's back-channel
+     * logout URL).
+     *
+     * @throws InvalidTokenException
+     * @throws HttpException When the signing keys cannot be loaded
+     */
+    public function verifyLogoutToken(#[\SensitiveParameter] string $logoutToken): LogoutToken
+    {
+        return LogoutToken::fromClaims($this->verifier->verifyLogoutToken($logoutToken));
     }
 
     /**
