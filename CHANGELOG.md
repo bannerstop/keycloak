@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 8.1.0
+
+- Back-channel logout: `KeycloakClient::verifyLogoutToken()` checks a logout
+  token (OpenID Connect Back-Channel Logout 1.0), `SessionRevocations` records
+  ended Keycloak sessions in a PSR-16 cache and rejects replayed tokens.
+- `KeycloakSession` and `SessionCheck`: an application session ends when its
+  Keycloak session was revoked, or when Keycloak refuses the refresh token at
+  the periodic check.
+- `Identity::getSessionId()` returns the Keycloak session id (`sid`).
+
 ## 8.0.1
 
 - Security: the login callback is checked against mix-up attacks (RFC 9207).
