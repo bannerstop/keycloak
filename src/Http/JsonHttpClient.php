@@ -16,11 +16,11 @@ use Psr\Http\Message\StreamFactoryInterface;
  *
  * @internal
  */
-final class JsonHttpClient
+final readonly class JsonHttpClient
 {
-    private readonly ClientInterface $client;
-    private readonly RequestFactoryInterface $requestFactory;
-    private readonly StreamFactoryInterface $streamFactory;
+    private ClientInterface $client;
+    private RequestFactoryInterface $requestFactory;
+    private StreamFactoryInterface $streamFactory;
 
     public function __construct(
         ClientInterface $client,
@@ -37,7 +37,7 @@ final class JsonHttpClient
      *
      * @return array<mixed>
      */
-    public function get(string $url, array $query = [], ?string $bearerToken = null): array
+    public function get(string $url, array $query = [], #[\SensitiveParameter] ?string $bearerToken = null): array
     {
         if ([] !== $query) {
             $url .= (!str_contains($url, '?') ? '?' : '&') . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
@@ -59,9 +59,9 @@ final class JsonHttpClient
      */
     public function postForm(
         string $url,
-        array $fields,
+        #[\SensitiveParameter] array $fields,
         ?string $basicUser = null,
-        ?string $basicPassword = null,
+        #[\SensitiveParameter] ?string $basicPassword = null,
     ): array {
         $request = $this->requestFactory->createRequest('POST', $url)
             ->withHeader('Accept', 'application/json')

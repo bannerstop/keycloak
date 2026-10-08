@@ -17,16 +17,16 @@ use Psr\Clock\ClockInterface;
  *
  * @internal
  */
-final class KeySetProvider
+final readonly class KeySetProvider
 {
     private const MIN_REFRESH_INTERVAL = 60;
-    private readonly ClockInterface $clock;
+    private ClockInterface $clock;
 
     public function __construct(
-        private readonly KeycloakConfig $config,
-        private readonly MetadataProvider $metadata,
-        private readonly JsonHttpClient $http,
-        private readonly Cache $cache,
+        private KeycloakConfig $config,
+        private MetadataProvider $metadata,
+        private JsonHttpClient $http,
+        private Cache $cache,
         ClockInterface $clock,
     ) {
         $this->clock = $clock;

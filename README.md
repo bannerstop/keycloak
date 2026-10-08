@@ -30,6 +30,7 @@ Composer does this for you with a `*` or a wide constraint.
 | 4.x     | ≥ 7.4   |
 | 5.x     | ≥ 8.0   |
 | 6.x     | ≥ 8.1   |
+| 7.x     | ≥ 8.2   |
 
 ## Installation
 

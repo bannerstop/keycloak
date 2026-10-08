@@ -13,20 +13,20 @@ use Bannerstop\Keycloak\Jwt\Algorithm;
  * The server URL and the realm are kept apart, so that the issuer and the
  * admin API URL can both be derived without parsing one from the other.
  */
-final class KeycloakConfig
+final readonly class KeycloakConfig
 {
-    private readonly string $serverUrl;
-    private readonly string $realm;
-    private readonly string $clientId;
-    private readonly ?string $clientSecret;
+    private string $serverUrl;
+    private string $realm;
+    private string $clientId;
+    private ?string $clientSecret;
 
     /** @var string[] */
-    private readonly array $scopes;
+    private array $scopes;
 
     /** @var Algorithm[] */
-    private readonly array $allowedAlgorithms;
-    private readonly int $leeway;
-    private readonly int $metadataTtl;
+    private array $allowedAlgorithms;
+    private int $leeway;
+    private int $metadataTtl;
 
     /**
      * @param string      $serverUrl         Base URL of the Keycloak server, e.g. https://sso.example.com
@@ -40,7 +40,7 @@ final class KeycloakConfig
         string $serverUrl,
         string $realm,
         string $clientId,
-        ?string $clientSecret = null,
+        #[\SensitiveParameter] ?string $clientSecret = null,
         array $scopes = ['openid', 'email', 'profile'],
         array $allowedAlgorithms = [Algorithm::RS256],
         int $leeway = 30,

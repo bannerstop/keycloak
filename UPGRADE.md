@@ -3,6 +3,10 @@
 Each major version raises the minimum PHP version. Only the steps that need
 changes in your code are listed.
 
+## 6.x → 7.x
+
+- PHP 8.2 or later is required. No code changes needed.
+
 ## 5.x → 6.x
 
 - PHP 8.1 or later is required.

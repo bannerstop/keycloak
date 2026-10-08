@@ -9,18 +9,18 @@ use Bannerstop\Keycloak\Support\Base64Url;
 /**
  * A public signing key from the realm's JWKS.
  */
-final class JsonWebKey
+final readonly class JsonWebKey
 {
     private const MIN_RSA_BITS = 2048;
     private const CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
 
     private function __construct(
-        private readonly ?string $keyId,
-        private readonly string $keyType,
-        private readonly ?Algorithm $algorithm,
-        private readonly ?string $curve,
+        private ?string $keyId,
+        private string $keyType,
+        private ?Algorithm $algorithm,
+        private ?string $curve,
         /** @var string PEM for RSA and EC, the raw 32 byte public key for Ed25519 */
-        private readonly string $material
+        private string $material
     )
     {
     }

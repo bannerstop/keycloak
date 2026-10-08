@@ -14,16 +14,16 @@ use Psr\Clock\ClockInterface;
  * Verifies signature, issuer and lifetime of a token, plus the checks that
  * are specific to ID tokens and access tokens.
  */
-final class TokenVerifier
+final readonly class TokenVerifier
 {
     /** Keycloak marks ID tokens with typ "ID" and access tokens with typ "Bearer". */
     private const TYPE_ID = 'ID';
     private const TYPE_ACCESS = 'Bearer';
-    private readonly ClockInterface $clock;
+    private ClockInterface $clock;
 
     public function __construct(
-        private readonly KeycloakConfig $config,
-        private readonly KeySetProvider $keys,
+        private KeycloakConfig $config,
+        private KeySetProvider $keys,
         ClockInterface $clock,
     ) {
         $this->clock = $clock;
@@ -35,7 +35,7 @@ final class TokenVerifier
      * @throws InvalidTokenException
      * @throws HttpException
      */
-    public function verifyIdToken(string $token, ?string $nonce): Claims
+    public function verifyIdToken(#[\SensitiveParameter] string $token, ?string $nonce): Claims
     {
         $claims = $this->verify($token, self::TYPE_ID);
 
@@ -65,7 +65,7 @@ final class TokenVerifier
      * @throws InvalidTokenException
      * @throws HttpException
      */
-    public function verifyAccessToken(string $token, string $audience): Claims
+    public function verifyAccessToken(#[\SensitiveParameter] string $token, string $audience): Claims
     {
         $claims = $this->verify($token, self::TYPE_ACCESS);
         if (!in_array($audience, $claims->getStringList('aud'), true)) {
@@ -83,7 +83,7 @@ final class TokenVerifier
      * @throws InvalidTokenException
      * @throws HttpException
      */
-    public function verifyOwnAccessToken(string $token): Claims
+    public function verifyOwnAccessToken(#[\SensitiveParameter] string $token): Claims
     {
         $claims = $this->verify($token, self::TYPE_ACCESS);
         if ($claims->getString('azp') !== $this->config->getClientId()) {
@@ -97,7 +97,7 @@ final class TokenVerifier
      * @throws InvalidTokenException
      * @throws HttpException
      */
-    private function verify(string $token, string $expectedType): Claims
+    private function verify(#[\SensitiveParameter] string $token, string $expectedType): Claims
     {
         $jwt = Jwt::parse($token);
         $algorithm = Algorithm::tryFrom((string) $jwt->getAlgorithm());

@@ -11,15 +11,15 @@ use Bannerstop\Keycloak\Support\Base64Url;
  * against CSRF, nonce against replayed ID tokens, the PKCE verifier against
  * stolen authorization codes.
  */
-final class PendingLogin
+final readonly class PendingLogin
 {
     public function __construct(
-        private readonly string $state,
-        private readonly string $nonce,
-        private readonly string $codeVerifier,
-        private readonly string $redirectUri,
-        private readonly ?string $returnTo,
-        private readonly int $expiresAt,
+        private string $state,
+        private string $nonce,
+        #[\SensitiveParameter] private string $codeVerifier,
+        private string $redirectUri,
+        private ?string $returnTo,
+        private int $expiresAt,
     ) {
     }
 

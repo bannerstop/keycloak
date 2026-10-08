@@ -14,12 +14,12 @@ use Bannerstop\Keycloak\Support\Cache;
  *
  * @internal
  */
-final class MetadataProvider
+final readonly class MetadataProvider
 {
     public function __construct(
-        private readonly KeycloakConfig $config,
-        private readonly JsonHttpClient $http,
-        private readonly Cache $cache,
+        private KeycloakConfig $config,
+        private JsonHttpClient $http,
+        private Cache $cache,
     ) {
     }
 

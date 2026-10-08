@@ -7,12 +7,12 @@ namespace Bannerstop\Keycloak\Login;
 use Bannerstop\Keycloak\Identity;
 use Bannerstop\Keycloak\Token\TokenSet;
 
-final class LoginResult
+final readonly class LoginResult
 {
     public function __construct(
-        private readonly Identity $identity,
-        private readonly TokenSet $tokens,
-        private readonly ?string $returnTo,
+        private Identity $identity,
+        private TokenSet $tokens,
+        private ?string $returnTo,
     ) {
     }
 

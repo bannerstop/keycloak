@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Bannerstop\Keycloak\Jwt;
 
-final class KeySet
+final readonly class KeySet
 {
     /** @var JsonWebKey[] */
-    private readonly array $keys;
+    private array $keys;
 
     /**
      * @param JsonWebKey[] $keys

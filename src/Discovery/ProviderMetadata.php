@@ -9,16 +9,16 @@ use Bannerstop\Keycloak\Exception\HttpException;
 /**
  * The parts of the OpenID Provider discovery document this library uses.
  */
-final class ProviderMetadata
+final readonly class ProviderMetadata
 {
     public function __construct(
-        private readonly string $issuer,
-        private readonly string $authorizationEndpoint,
-        private readonly string $tokenEndpoint,
-        private readonly string $jwksUri,
-        private readonly ?string $userinfoEndpoint = null,
-        private readonly ?string $endSessionEndpoint = null,
-        private readonly ?string $revocationEndpoint = null,
+        private string $issuer,
+        private string $authorizationEndpoint,
+        private string $tokenEndpoint,
+        private string $jwksUri,
+        private ?string $userinfoEndpoint = null,
+        private ?string $endSessionEndpoint = null,
+        private ?string $revocationEndpoint = null,
     ) {
     }
 

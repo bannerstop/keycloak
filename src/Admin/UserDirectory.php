@@ -12,12 +12,12 @@ use Bannerstop\Keycloak\KeycloakClient;
  * application's user table. The client needs a service account with the
  * realm-management role "view-users".
  */
-final class UserDirectory
+final readonly class UserDirectory
 {
     private const PAGE_SIZE = 100;
 
     public function __construct(
-        private readonly KeycloakClient $client,
+        private KeycloakClient $client,
     ) {
     }
 

@@ -8,12 +8,12 @@ namespace Bannerstop\Keycloak\Login;
  * StateStore on top of $_SESSION, for applications without a framework.
  * The session must be started before the store is used.
  */
-final class NativeSessionStateStore implements StateStore
+final readonly class NativeSessionStateStore implements StateStore
 {
     private const MAX_PENDING = 5;
 
     public function __construct(
-        private readonly string $sessionKey = '_bannerstop_keycloak_logins',
+        private string $sessionKey = '_bannerstop_keycloak_logins',
     ) {
     }
 

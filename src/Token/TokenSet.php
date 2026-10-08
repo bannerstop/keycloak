@@ -9,14 +9,14 @@ use Bannerstop\Keycloak\Exception\HttpException;
 /**
  * The tokens of one token endpoint response.
  */
-final class TokenSet
+final readonly class TokenSet
 {
     public function __construct(
-        private readonly string $accessToken,
-        private readonly ?int $expiresAt,
-        private readonly ?string $refreshToken = null,
-        private readonly ?int $refreshExpiresAt = null,
-        private readonly ?string $idToken = null,
+        #[\SensitiveParameter] private string $accessToken,
+        private ?int $expiresAt,
+        #[\SensitiveParameter] private ?string $refreshToken = null,
+        private ?int $refreshExpiresAt = null,
+        #[\SensitiveParameter] private ?string $idToken = null,
     ) {
     }
 

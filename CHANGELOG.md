@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 7.0.0
+
+- Requires PHP 8.2 or later.
+- Value objects are readonly classes.
+- Client secret, tokens, authorization codes and the PKCE verifier are marked
+  `#[\SensitiveParameter]`, so they no longer show up in stack traces.
+
 ## 6.0.0
 
 - Requires PHP 8.1 or later.

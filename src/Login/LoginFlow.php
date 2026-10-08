@@ -15,15 +15,15 @@ use Bannerstop\Keycloak\Policy\IdentityPolicy;
  * The browser login: start() sends the user to Keycloak, finish() handles
  * the callback and returns the verified identity.
  */
-final class LoginFlow
+final readonly class LoginFlow
 {
     /**
      * @param IdentityPolicy[] $policies All of them must allow an identity
      */
     public function __construct(
-        private readonly KeycloakClient $client,
-        private readonly StateStore $store,
-        private readonly array $policies = [],
+        private KeycloakClient $client,
+        private StateStore $store,
+        private array $policies = [],
     ) {
     }
 
@@ -49,7 +49,7 @@ final class LoginFlow
      *
      * @throws LoginException
      */
-    public function finish(array $query): LoginResult
+    public function finish(#[\SensitiveParameter] array $query): LoginResult
     {
         $state = self::parameter($query, 'state');
         $login = null === $state ? null : $this->store->take($state);
@@ -88,7 +88,7 @@ final class LoginFlow
     /**
      * @param array<string, mixed> $query
      */
-    private static function parameter(array $query, string $name): ?string
+    private static function parameter(#[\SensitiveParameter] array $query, string $name): ?string
     {
         return isset($query[$name]) && is_string($query[$name]) && '' !== $query[$name] ? $query[$name] : null;
     }

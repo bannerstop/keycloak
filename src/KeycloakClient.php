@@ -89,7 +89,7 @@ class KeycloakClient
      *
      * @throws HttpException
      */
-    public function exchangeCode(string $code, PendingLogin $login): TokenSet
+    public function exchangeCode(#[\SensitiveParameter] string $code, PendingLogin $login): TokenSet
     {
         return $this->requestTokens([
             'grant_type' => 'authorization_code',
@@ -102,7 +102,7 @@ class KeycloakClient
     /**
      * @throws HttpException
      */
-    public function refresh(string $refreshToken): TokenSet
+    public function refresh(#[\SensitiveParameter] string $refreshToken): TokenSet
     {
         return $this->requestTokens(['grant_type' => 'refresh_token', 'refresh_token' => $refreshToken]);
     }
@@ -158,7 +158,7 @@ class KeycloakClient
      * @throws InvalidTokenException
      * @throws HttpException         When the signing keys cannot be loaded
      */
-    public function verifyAccessToken(string $accessToken, ?string $audience = null): Identity
+    public function verifyAccessToken(#[\SensitiveParameter] string $accessToken, ?string $audience = null): Identity
     {
         return new Identity($this->verifier->verifyAccessToken($accessToken, $audience ?? $this->config->getClientId()));
     }
@@ -169,7 +169,7 @@ class KeycloakClient
      *
      * @throws HttpException
      */
-    public function getUserInfo(string $accessToken): Claims
+    public function getUserInfo(#[\SensitiveParameter] string $accessToken): Claims
     {
         $endpoint = $this->getMetadata()->getUserinfoEndpoint();
         if (null === $endpoint) {
@@ -185,7 +185,7 @@ class KeycloakClient
      *
      * @param string|null $idToken The ID token of the session; without it Keycloak asks the user to confirm
      */
-    public function getLogoutUrl(?string $postLogoutRedirectUri = null, ?string $idToken = null): ?string
+    public function getLogoutUrl(?string $postLogoutRedirectUri = null, #[\SensitiveParameter] ?string $idToken = null): ?string
     {
         $endpoint = $this->getMetadata()->getEndSessionEndpoint();
         if (null === $endpoint) {
@@ -208,7 +208,7 @@ class KeycloakClient
      *
      * @throws HttpException
      */
-    public function revokeRefreshToken(string $refreshToken): void
+    public function revokeRefreshToken(#[\SensitiveParameter] string $refreshToken): void
     {
         $endpoint = $this->getMetadata()->getRevocationEndpoint();
         if (null !== $endpoint) {

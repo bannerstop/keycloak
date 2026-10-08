@@ -269,4 +269,17 @@ final class TokenVerificationTest extends TestCase
 
         $realm->client()->getIdentity($tokens, 'the-nonce');
     }
+
+    public function testTokensStayOutOfStackTraces(): void
+    {
+        $realm = new FakeKeycloak();
+        $token = $realm->key->sign(FakeKeycloak::accessClaims(['aud' => 'other']));
+
+        try {
+            $realm->client()->verifyAccessToken($token, 'api');
+            self::fail('The token was accepted.');
+        } catch (InvalidTokenException $exception) {
+            self::assertStringNotContainsString(substr($token, -20), $exception->getTraceAsString());
+        }
+    }
 }

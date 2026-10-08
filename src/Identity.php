@@ -9,11 +9,11 @@ use Bannerstop\Keycloak\Token\Claims;
 /**
  * The verified user behind a login or an access token.
  */
-final class Identity
+final readonly class Identity
 {
-    private readonly string $subject;
+    private string $subject;
 
-    public function __construct(private readonly Claims $claims)
+    public function __construct(private Claims $claims)
     {
         $this->subject = $this->claims->getString('sub') ?? throw new \InvalidArgumentException('An identity needs a subject.');
     }

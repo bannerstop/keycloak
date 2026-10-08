@@ -11,17 +11,17 @@ use Bannerstop\Keycloak\Identity;
  * Lets only users with a verified e-mail address of the given domains in.
  * Subdomains are not included, list them explicitly.
  */
-final class EmailDomainPolicy implements IdentityPolicy
+final readonly class EmailDomainPolicy implements IdentityPolicy
 {
     /** @var string[] */
-    private readonly array $domains;
+    private array $domains;
 
     /**
      * @param string[] $domains
      */
     public function __construct(
         array $domains,
-        private readonly bool $requireVerified = true,
+        private bool $requireVerified = true,
     ) {
         $normalized = [];
         foreach ($domains as $domain) {

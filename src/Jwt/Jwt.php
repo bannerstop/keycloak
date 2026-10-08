@@ -28,7 +28,7 @@ final class Jwt
     ) {
     }
 
-    public static function parse(string $token): self
+    public static function parse(#[\SensitiveParameter] string $token): self
     {
         if (strlen($token) > self::MAX_LENGTH) {
             throw new InvalidTokenException('The token is too long.');
