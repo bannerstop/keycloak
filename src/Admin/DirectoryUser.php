@@ -9,26 +9,13 @@ namespace Bannerstop\Keycloak\Admin;
  */
 final class DirectoryUser
 {
-    /** @var string */
-    private $id;
-
-    /** @var string */
-    private $username;
-
-    /** @var string|null */
-    private $email;
-
-    /** @var string|null */
-    private $firstName;
-
-    /** @var string|null */
-    private $lastName;
-
-    /** @var bool */
-    private $enabled;
-
-    /** @var bool */
-    private $emailVerified;
+    private string $id;
+    private string $username;
+    private ?string $email;
+    private ?string $firstName;
+    private ?string $lastName;
+    private bool $enabled;
+    private bool $emailVerified;
 
     public function __construct(string $id, string $username, ?string $email, ?string $firstName, ?string $lastName, bool $enabled, bool $emailVerified)
     {
@@ -46,9 +33,7 @@ final class DirectoryUser
      */
     public static function fromArray(array $representation): ?self
     {
-        $string = static function (string $field) use ($representation): ?string {
-            return isset($representation[$field]) && is_string($representation[$field]) && '' !== trim($representation[$field]) ? trim($representation[$field]) : null;
-        };
+        $string = (static fn (string $field): ?string => isset($representation[$field]) && is_string($representation[$field]) && '' !== trim($representation[$field]) ? trim($representation[$field]) : null);
         $id = $string('id');
         $username = $string('username');
         if (null === $id || null === $username) {
@@ -97,9 +82,7 @@ final class DirectoryUser
 
     public function getDisplayName(): string
     {
-        $parts = array_filter([$this->firstName, $this->lastName], static function (?string $part): bool {
-            return null !== $part;
-        });
+        $parts = array_filter([$this->firstName, $this->lastName], static fn (?string $part): bool => null !== $part);
 
         return [] !== $parts ? implode(' ', $parts) : ($this->email ?? $this->username);
     }

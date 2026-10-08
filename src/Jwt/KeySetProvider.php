@@ -21,20 +21,11 @@ final class KeySetProvider
 {
     private const MIN_REFRESH_INTERVAL = 60;
 
-    /** @var KeycloakConfig */
-    private $config;
-
-    /** @var MetadataProvider */
-    private $metadata;
-
-    /** @var JsonHttpClient */
-    private $http;
-
-    /** @var Cache */
-    private $cache;
-
-    /** @var ClockInterface */
-    private $clock;
+    private KeycloakConfig $config;
+    private MetadataProvider $metadata;
+    private JsonHttpClient $http;
+    private Cache $cache;
+    private ClockInterface $clock;
 
     public function __construct(KeycloakConfig $config, MetadataProvider $metadata, JsonHttpClient $http, Cache $cache, ClockInterface $clock)
     {

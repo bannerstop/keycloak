@@ -18,16 +18,16 @@ use Bannerstop\Keycloak\Identity;
 final class RoleMapper
 {
     /** @var string[] */
-    private $defaultRoles;
+    private array $defaultRoles;
 
     /** @var array<string, string[]> */
-    private $realmRoles = [];
+    private array $realmRoles = [];
 
     /** @var array<string, array<string, string[]>> */
-    private $clientRoles = [];
+    private array $clientRoles = [];
 
     /** @var array<string, string[]> */
-    private $groups = [];
+    private array $groups = [];
 
     /**
      * @param string[] $defaultRoles Roles every authenticated user gets

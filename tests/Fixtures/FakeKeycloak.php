@@ -19,20 +19,13 @@ final class FakeKeycloak
     public const JWKS_URI = self::ISSUER . '/protocol/openid-connect/certs';
     public const NOW = 1750000000;
 
-    /** @var FakeHttpClient */
-    public $http;
-
-    /** @var FrozenClock */
-    public $clock;
-
-    /** @var TestKey */
-    public $key;
-
-    /** @var KeycloakConfig */
-    public $config;
+    public FakeHttpClient $http;
+    public FrozenClock $clock;
+    public TestKey $key;
+    public KeycloakConfig $config;
 
     /** @var array<int, array<string, string>> */
-    private $publishedKeys;
+    private array $publishedKeys;
 
     /**
      * @param string[] $allowedAlgorithms
@@ -54,9 +47,7 @@ final class FakeKeycloak
             'revocation_endpoint' => self::ISSUER . '/protocol/openid-connect/revoke',
             'jwks_uri' => self::JWKS_URI,
         ]]);
-        $this->http->on('GET', self::JWKS_URI, function (): array {
-            return [200, ['keys' => $this->publishedKeys]];
-        });
+        $this->http->on('GET', self::JWKS_URI, fn (): array => [200, ['keys' => $this->publishedKeys]]);
     }
 
     public static function sharedRsaKey(): TestKey
@@ -131,8 +122,6 @@ final class FakeKeycloak
             'exp' => self::NOW + 300,
         ], $overrides);
 
-        return array_filter($claims, static function ($value): bool {
-            return null !== $value;
-        });
+        return array_filter($claims, static fn ($value): bool => null !== $value);
     }
 }

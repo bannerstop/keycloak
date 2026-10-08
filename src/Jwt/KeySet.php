@@ -7,7 +7,7 @@ namespace Bannerstop\Keycloak\Jwt;
 final class KeySet
 {
     /** @var JsonWebKey[] */
-    private $keys;
+    private array $keys;
 
     /**
      * @param JsonWebKey[] $keys

@@ -8,8 +8,7 @@ use Psr\Clock\ClockInterface;
 
 final class FrozenClock implements ClockInterface
 {
-    /** @var int */
-    public $time;
+    public int $time;
 
     public function __construct(int $time)
     {

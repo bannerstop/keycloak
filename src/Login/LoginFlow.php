@@ -16,14 +16,11 @@ use Bannerstop\Keycloak\Policy\IdentityPolicy;
  */
 final class LoginFlow
 {
-    /** @var KeycloakClient */
-    private $client;
-
-    /** @var StateStore */
-    private $store;
+    private KeycloakClient $client;
+    private StateStore $store;
 
     /** @var IdentityPolicy[] */
-    private $policies;
+    private array $policies;
 
     /**
      * @param IdentityPolicy[] $policies All of them must allow an identity

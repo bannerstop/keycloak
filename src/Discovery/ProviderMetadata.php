@@ -11,26 +11,13 @@ use Bannerstop\Keycloak\Exception\HttpException;
  */
 final class ProviderMetadata
 {
-    /** @var string */
-    private $issuer;
-
-    /** @var string */
-    private $authorizationEndpoint;
-
-    /** @var string */
-    private $tokenEndpoint;
-
-    /** @var string|null */
-    private $userinfoEndpoint;
-
-    /** @var string|null */
-    private $endSessionEndpoint;
-
-    /** @var string */
-    private $jwksUri;
-
-    /** @var string|null */
-    private $revocationEndpoint;
+    private string $issuer;
+    private string $authorizationEndpoint;
+    private string $tokenEndpoint;
+    private ?string $userinfoEndpoint;
+    private ?string $endSessionEndpoint;
+    private string $jwksUri;
+    private ?string $revocationEndpoint;
 
     public function __construct(
         string $issuer,
@@ -61,9 +48,7 @@ final class ProviderMetadata
             }
         }
 
-        $optional = static function (string $name) use ($document): ?string {
-            return isset($document[$name]) && is_string($document[$name]) && '' !== $document[$name] ? $document[$name] : null;
-        };
+        $optional = (static fn (string $name): ?string => isset($document[$name]) && is_string($document[$name]) && '' !== $document[$name] ? $document[$name] : null);
 
         return new self(
             $document['issuer'],

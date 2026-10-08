@@ -17,11 +17,10 @@ use Psr\SimpleCache\InvalidArgumentException;
  */
 final class Cache
 {
-    /** @var CacheInterface|null */
-    private $cache;
+    private ?CacheInterface $cache;
 
     /** @var array<string, mixed> */
-    private $memory = [];
+    private array $memory = [];
 
     public function __construct(?CacheInterface $cache = null)
     {

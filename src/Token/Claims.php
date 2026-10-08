@@ -11,7 +11,7 @@ namespace Bannerstop\Keycloak\Token;
 final class Claims
 {
     /** @var array<string, mixed> */
-    private $claims;
+    private array $claims;
 
     /**
      * @param array<string, mixed> $claims
@@ -74,9 +74,7 @@ final class Claims
             return [];
         }
 
-        return array_values(array_filter($value, static function ($item): bool {
-            return is_string($item) && '' !== $item;
-        }));
+        return array_values(array_filter($value, static fn ($item): bool => is_string($item) && '' !== $item));
     }
 
     /**

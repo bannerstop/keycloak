@@ -17,16 +17,10 @@ final class TestKey
     private $privateKey;
 
     /** @var array<string, string> */
-    private $jwk;
-
-    /** @var string */
-    public $algorithm;
-
-    /** @var string */
-    public $kid;
-
-    /** @var int|null */
-    private $ecSize;
+    private array $jwk;
+    public string $algorithm;
+    public string $kid;
+    private ?int $ecSize;
 
     /**
      * @param resource|\OpenSSLAsymmetricKey $privateKey

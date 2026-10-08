@@ -6,8 +6,7 @@ namespace Bannerstop\Keycloak\Exception;
 
 class HttpException extends \RuntimeException implements KeycloakException
 {
-    /** @var int|null */
-    private $statusCode;
+    private ?int $statusCode;
 
     public function __construct(string $message, ?int $statusCode = null, ?\Throwable $previous = null)
     {

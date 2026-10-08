@@ -14,10 +14,8 @@ use Bannerstop\Keycloak\Identity;
 final class EmailDomainPolicy implements IdentityPolicy
 {
     /** @var string[] */
-    private $domains;
-
-    /** @var bool */
-    private $requireVerified;
+    private array $domains;
+    private bool $requireVerified;
 
     /**
      * @param string[] $domains

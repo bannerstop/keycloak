@@ -18,14 +18,9 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 final class JsonHttpClient
 {
-    /** @var ClientInterface */
-    private $client;
-
-    /** @var RequestFactoryInterface */
-    private $requestFactory;
-
-    /** @var StreamFactoryInterface */
-    private $streamFactory;
+    private ClientInterface $client;
+    private RequestFactoryInterface $requestFactory;
+    private StreamFactoryInterface $streamFactory;
 
     public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory)
     {

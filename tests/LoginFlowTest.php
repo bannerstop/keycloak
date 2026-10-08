@@ -17,18 +17,15 @@ final class LoginFlowTest extends TestCase
 {
     private const CALLBACK = 'https://app.example.com/login/callback';
 
-    /** @var FakeKeycloak */
-    private $realm;
-
-    /** @var StateStore */
-    private $store;
+    private FakeKeycloak $realm;
+    private StateStore $store;
 
     protected function setUp(): void
     {
         $this->realm = new FakeKeycloak();
         $this->store = new class() implements StateStore {
             /** @var array<string, PendingLogin> */
-            public $logins = [];
+            public array $logins = [];
 
             public function save(PendingLogin $login): void
             {

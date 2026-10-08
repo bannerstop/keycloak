@@ -9,14 +9,9 @@ use Bannerstop\Keycloak\Token\TokenSet;
 
 final class LoginResult
 {
-    /** @var Identity */
-    private $identity;
-
-    /** @var TokenSet */
-    private $tokens;
-
-    /** @var string|null */
-    private $returnTo;
+    private Identity $identity;
+    private TokenSet $tokens;
+    private ?string $returnTo;
 
     public function __construct(Identity $identity, TokenSet $tokens, ?string $returnTo)
     {

@@ -11,20 +11,11 @@ use Bannerstop\Keycloak\Exception\HttpException;
  */
 final class TokenSet
 {
-    /** @var string */
-    private $accessToken;
-
-    /** @var int|null */
-    private $expiresAt;
-
-    /** @var string|null */
-    private $refreshToken;
-
-    /** @var int|null */
-    private $refreshExpiresAt;
-
-    /** @var string|null */
-    private $idToken;
+    private string $accessToken;
+    private ?int $expiresAt;
+    private ?string $refreshToken;
+    private ?int $refreshExpiresAt;
+    private ?string $idToken;
 
     public function __construct(string $accessToken, ?int $expiresAt, ?string $refreshToken = null, ?int $refreshExpiresAt = null, ?string $idToken = null)
     {
@@ -43,12 +34,8 @@ final class TokenSet
         if (!isset($response['access_token']) || !is_string($response['access_token']) || '' === $response['access_token']) {
             throw new HttpException('The token endpoint returned no access token.');
         }
-        $lifetime = static function (string $field) use ($response, $now): ?int {
-            return isset($response[$field]) && is_numeric($response[$field]) && (int) $response[$field] > 0 ? $now + (int) $response[$field] : null;
-        };
-        $string = static function (string $field) use ($response): ?string {
-            return isset($response[$field]) && is_string($response[$field]) && '' !== $response[$field] ? $response[$field] : null;
-        };
+        $lifetime = (static fn (string $field): ?int => isset($response[$field]) && is_numeric($response[$field]) && (int) $response[$field] > 0 ? $now + (int) $response[$field] : null);
+        $string = (static fn (string $field): ?string => isset($response[$field]) && is_string($response[$field]) && '' !== $response[$field] ? $response[$field] : null);
 
         return new self($response['access_token'], $lifetime('expires_in'), $string('refresh_token'), $lifetime('refresh_expires_in'), $string('id_token'));
     }

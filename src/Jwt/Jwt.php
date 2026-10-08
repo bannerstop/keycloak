@@ -17,16 +17,12 @@ final class Jwt
     private const MAX_LENGTH = 65536;
 
     /** @var array<mixed> */
-    private $header;
+    private array $header;
 
     /** @var array<mixed> */
-    private $payload;
-
-    /** @var string */
-    private $signingInput;
-
-    /** @var string */
-    private $signature;
+    private array $payload;
+    private string $signingInput;
+    private string $signature;
 
     /**
      * @param array<mixed> $header

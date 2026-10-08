@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 4.0.0
+
+- Requires PHP 7.4 or later.
+- Typed properties and arrow functions throughout.
+
 ## 3.0.0
 
 - Requires PHP 7.3 or later.

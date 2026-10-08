@@ -12,10 +12,10 @@ use Psr\Http\Message\ResponseInterface;
 final class FakeHttpClient implements ClientInterface
 {
     /** @var array<string, array<int, callable|array{0: int, 1: mixed}>> */
-    private $routes = [];
+    private array $routes = [];
 
     /** @var RequestInterface[] */
-    public $requests = [];
+    public array $requests = [];
 
     /**
      * @param callable|array{0: int, 1: mixed} $response a [status, json] pair or a callable(RequestInterface): array
@@ -48,8 +48,6 @@ final class FakeHttpClient implements ClientInterface
      */
     public function requestsTo(string $method, string $url): array
     {
-        return array_values(array_filter($this->requests, static function (RequestInterface $request) use ($method, $url): bool {
-            return $request->getMethod() === $method && (string) $request->getUri()->withQuery('') === $url;
-        }));
+        return array_values(array_filter($this->requests, static fn (RequestInterface $request): bool => $request->getMethod() === $method && (string) $request->getUri()->withQuery('') === $url));
     }
 }

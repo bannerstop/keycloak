@@ -113,9 +113,7 @@ final class BuildingBlocksTest extends TestCase
     public function testEmailDomainPolicy(): void
     {
         $policy = new EmailDomainPolicy([' Example.com ']);
-        $identity = static function (string $email, bool $verified): Identity {
-            return new Identity(new Claims(['sub' => 'u', 'email' => $email, 'email_verified' => $verified]));
-        };
+        $identity = (static fn (string $email, bool $verified): Identity => new Identity(new Claims(['sub' => 'u', 'email' => $email, 'email_verified' => $verified])));
 
         self::assertTrue($policy->allows($identity('jane@EXAMPLE.com', true)));
         self::assertFalse($policy->allows($identity('jane@example.com', false)), 'unverified');

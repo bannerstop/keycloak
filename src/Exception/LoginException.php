@@ -26,8 +26,7 @@ class LoginException extends \RuntimeException implements KeycloakException
     /** The identity was verified, but an IdentityPolicy rejected it. */
     public const NOT_ALLOWED = 'not_allowed';
 
-    /** @var string */
-    private $reason;
+    private string $reason;
 
     public function __construct(string $reason, string $message, ?\Throwable $previous = null)
     {

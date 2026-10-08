@@ -15,29 +15,18 @@ use Bannerstop\Keycloak\Jwt\Algorithm;
  */
 final class KeycloakConfig
 {
-    /** @var string */
-    private $serverUrl;
-
-    /** @var string */
-    private $realm;
-
-    /** @var string */
-    private $clientId;
-
-    /** @var string|null */
-    private $clientSecret;
+    private string $serverUrl;
+    private string $realm;
+    private string $clientId;
+    private ?string $clientSecret;
 
     /** @var string[] */
-    private $scopes;
+    private array $scopes;
 
     /** @var string[] */
-    private $allowedAlgorithms;
-
-    /** @var int */
-    private $leeway;
-
-    /** @var int */
-    private $metadataTtl;
+    private array $allowedAlgorithms;
+    private int $leeway;
+    private int $metadataTtl;
 
     /**
      * @param string      $serverUrl         Base URL of the Keycloak server, e.g. https://sso.example.com

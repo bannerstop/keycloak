@@ -14,20 +14,13 @@ final class JsonWebKey
     private const MIN_RSA_BITS = 2048;
     private const CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
 
-    /** @var string|null */
-    private $keyId;
-
-    /** @var string */
-    private $keyType;
-
-    /** @var string|null */
-    private $algorithm;
-
-    /** @var string|null */
-    private $curve;
+    private ?string $keyId;
+    private string $keyType;
+    private ?string $algorithm;
+    private ?string $curve;
 
     /** @var string PEM for RSA and EC, the raw 32 byte public key for Ed25519 */
-    private $material;
+    private string $material;
 
     private function __construct(?string $keyId, string $keyType, ?string $algorithm, ?string $curve, string $material)
     {

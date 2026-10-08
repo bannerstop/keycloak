@@ -11,11 +11,8 @@ use Bannerstop\Keycloak\Token\Claims;
  */
 final class Identity
 {
-    /** @var Claims */
-    private $claims;
-
-    /** @var string */
-    private $subject;
+    private Claims $claims;
+    private string $subject;
 
     public function __construct(Claims $claims)
     {
@@ -84,9 +81,7 @@ final class Identity
         if (null !== $name) {
             return $name;
         }
-        $parts = array_filter([$this->getGivenName(), $this->getFamilyName()], static function (?string $part): bool {
-            return null !== $part;
-        });
+        $parts = array_filter([$this->getGivenName(), $this->getFamilyName()], static fn (?string $part): bool => null !== $part);
         if ([] !== $parts) {
             return implode(' ', $parts);
         }

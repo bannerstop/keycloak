@@ -20,14 +20,9 @@ final class TokenVerifier
     private const TYPE_ID = 'ID';
     private const TYPE_ACCESS = 'Bearer';
 
-    /** @var KeycloakConfig */
-    private $config;
-
-    /** @var KeySetProvider */
-    private $keys;
-
-    /** @var ClockInterface */
-    private $clock;
+    private KeycloakConfig $config;
+    private KeySetProvider $keys;
+    private ClockInterface $clock;
 
     public function __construct(KeycloakConfig $config, KeySetProvider $keys, ClockInterface $clock)
     {

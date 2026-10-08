@@ -31,23 +31,12 @@ class KeycloakClient
     /** Parameters an application may add to the authorization request. */
     private const AUTHORIZATION_PARAMETERS = ['prompt', 'login_hint', 'kc_idp_hint', 'ui_locales', 'max_age', 'acr_values', 'kc_action'];
 
-    /** @var KeycloakConfig */
-    private $config;
-
-    /** @var JsonHttpClient */
-    private $http;
-
-    /** @var MetadataProvider */
-    private $metadata;
-
-    /** @var TokenVerifier */
-    private $verifier;
-
-    /** @var ClockInterface */
-    private $clock;
-
-    /** @var TokenSet|null */
-    private $serviceAccountTokens;
+    private KeycloakConfig $config;
+    private JsonHttpClient $http;
+    private MetadataProvider $metadata;
+    private TokenVerifier $verifier;
+    private ClockInterface $clock;
+    private ?TokenSet $serviceAccountTokens = null;
 
     public function __construct(
         KeycloakConfig $config,
