@@ -80,6 +80,15 @@
       "attributes": {
         "pkce.code.challenge.method": "S256"
       }
+    },
+    {
+      "clientId": "app-directory",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "app-directory-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
     }
   ],
   "users": [
@@ -114,6 +123,16 @@
       "username": "service-account-app",
       "enabled": true,
       "serviceAccountClientId": "app",
+      "clientRoles": {
+        "realm-management": [
+          "view-users"
+        ]
+      }
+    },
+    {
+      "username": "service-account-app-directory",
+      "enabled": true,
+      "serviceAccountClientId": "app-directory",
       "clientRoles": {
         "realm-management": [
           "view-users"
