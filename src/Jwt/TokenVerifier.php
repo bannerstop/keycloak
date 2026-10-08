@@ -19,6 +19,8 @@ final readonly class TokenVerifier
     /** Keycloak marks ID tokens with typ "ID" and access tokens with typ "Bearer". */
     private const TYPE_ID = 'ID';
     private const TYPE_ACCESS = 'Bearer';
+    private const TYPE_LOGOUT = 'Logout';
+    private const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-logout';
     private ClockInterface $clock;
 
     public function __construct(
@@ -94,10 +96,45 @@ final readonly class TokenVerifier
     }
 
     /**
+     * Logout token checks of OpenID Connect Back-Channel Logout 1.0, 2.6.
+     * The events claim keeps ID and access tokens from passing as logout
+     * tokens, the jti makes replays detectable (see SessionRevocations).
+     *
      * @throws InvalidTokenException
      * @throws HttpException
      */
-    private function verify(#[\SensitiveParameter] string $token, string $expectedType): Claims
+    public function verifyLogoutToken(#[\SensitiveParameter] string $token): Claims
+    {
+        $claims = $this->verify($token, self::TYPE_LOGOUT, false);
+
+        if (!in_array($this->config->getClientId(), $claims->getStringList('aud'), true)) {
+            throw new InvalidTokenException('The logout token was issued for another client.');
+        }
+        if (null === $claims->getInt('iat')) {
+            throw new InvalidTokenException('The logout token has no iat claim.');
+        }
+        if (null === $claims->getString('jti')) {
+            throw new InvalidTokenException('The logout token has no jti claim.');
+        }
+        $events = $claims->get('events');
+        if (!is_array($events) || !array_key_exists(self::BACKCHANNEL_LOGOUT_EVENT, $events)) {
+            throw new InvalidTokenException('The token is not a back-channel logout token.');
+        }
+        if ($claims->has('nonce')) {
+            throw new InvalidTokenException('A logout token must not carry a nonce.');
+        }
+        if (null === $claims->getString('sub') && null === $claims->getString('sid')) {
+            throw new InvalidTokenException('The logout token names neither a user nor a session.');
+        }
+
+        return $claims;
+    }
+
+    /**
+     * @throws InvalidTokenException
+     * @throws HttpException
+     */
+    private function verify(#[\SensitiveParameter] string $token, string $expectedType, bool $requireSubject = true): Claims
     {
         $jwt = Jwt::parse($token);
         $algorithm = Algorithm::tryFrom((string) $jwt->getAlgorithm());
@@ -119,7 +156,7 @@ final readonly class TokenVerifier
         if ($claims->getString('iss') !== $this->config->getIssuer()) {
             throw new InvalidTokenException('The token was issued by another issuer.');
         }
-        if (null === $claims->getString('sub')) {
+        if ($requireSubject && null === $claims->getString('sub')) {
             throw new InvalidTokenException('The token has no subject.');
         }
         $type = $claims->getString('typ');
