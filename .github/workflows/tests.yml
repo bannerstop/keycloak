@@ -1,0 +1,59 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+        dependencies: [highest]
+        include:
+          - php: '7.1'
+            dependencies: lowest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - run: composer update --no-interaction --no-progress ${{ matrix.dependencies == 'lowest' && '--prefer-lowest' || '' }}
+      - run: vendor/bin/phpunit
+
+  keycloak:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '7.1'
+            http-client: 'php-http/guzzle6-adapter:^2.0'
+          - php: '8.5'
+            http-client: 'symfony/http-client'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start Keycloak
+        run: |
+          docker run -d --name keycloak -p 8080:8080 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -v "$PWD/tests-e2e/realm.json:/opt/keycloak/data/import/realm.json:ro" \
+            quay.io/keycloak/keycloak:26.4 start-dev --import-realm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - working-directory: tests-e2e
+        run: composer require --no-interaction --no-progress ${{ matrix.http-client }}
+      - name: Wait for Keycloak
+        run: timeout 120 bash -c 'until curl -sf http://localhost:8080/realms/example/.well-known/openid-configuration; do sleep 2; done' > /dev/null
+      - working-directory: tests-e2e
+        run: php run.php
+        env:
+          KEYCLOAK_URL: http://localhost:8080

@@ -1,0 +1,57 @@
+{
+  "realm": "example",
+  "enabled": true,
+  "sslRequired": "none",
+  "roles": {
+    "realm": [{ "name": "admin" }],
+    "client": { "app": [{ "name": "editor" }] }
+  },
+  "groups": [{ "name": "staff", "subGroups": [{ "name": "it" }] }],
+  "clients": [
+    {
+      "clientId": "app",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "app-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "redirectUris": ["http://app.test/callback"],
+      "attributes": { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "http://app.test/" },
+      "protocolMappers": [
+        { "name": "groups", "protocol": "openid-connect", "protocolMapper": "oidc-group-membership-mapper",
+          "config": { "claim.name": "groups", "full.path": "true", "access.token.claim": "true", "id.token.claim": "false", "userinfo.token.claim": "true" } },
+        { "name": "api audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.custom.audience": "api", "access.token.claim": "true", "id.token.claim": "false" } }
+      ]
+    },
+    {
+      "clientId": "public-app",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["http://app.test/callback"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    }
+  ],
+  "users": [
+    {
+      "username": "jdoe",
+      "enabled": true,
+      "email": "jane.doe@example.com",
+      "emailVerified": true,
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "credentials": [{ "type": "password", "value": "jane-password", "temporary": false }],
+      "realmRoles": ["admin", "default-roles-example"],
+      "clientRoles": { "app": ["editor"] },
+      "groups": ["/staff/it"]
+    },
+    {
+      "username": "service-account-app",
+      "enabled": true,
+      "serviceAccountClientId": "app",
+      "clientRoles": { "realm-management": ["view-users"] }
+    }
+  ]
+}
