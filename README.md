@@ -154,6 +154,57 @@ try {
 }
 ```
 
+### Ending sessions with Keycloak
+
+Logging out of Keycloak, or of another application, does not end the session
+of your application by itself. Two mechanisms close that gap; use both.
+
+**Back-channel logout** (OpenID Connect Back-Channel Logout 1.0): Keycloak
+posts a signed logout token to your application when a session ends. Set the
+client's *Backchannel logout URL* and turn on *Backchannel logout session
+required*, then record the token:
+
+```php
+use Bannerstop\Keycloak\Exception\KeycloakException;
+use Bannerstop\Keycloak\Session\SessionRevocations;
+
+// POST /keycloak/backchannel-logout - no session, no CSRF token
+$revocations = new SessionRevocations($psr16Cache, 8 * 3600); // shared by all web servers
+try {
+    $accepted = $revocations->revoke($keycloak->verifyLogoutToken((string) ($_POST['logout_token'] ?? '')));
+} catch (KeycloakException $exception) {
+    $accepted = false;
+}
+http_response_code($accepted ? 200 : 400); // false also means: replayed token
+```
+
+**Session check**: keep a `KeycloakSession` next to your login and check it on
+every request. It ends sessions that Keycloak revoked through the back channel,
+and every `$interval` seconds it redeems the refresh token, which fails once the
+Keycloak session is gone (logout elsewhere, user disabled, SSO session
+expired). If Keycloak is unreachable, the session is kept.
+
+```php
+use Bannerstop\Keycloak\Session\KeycloakSession;
+use Bannerstop\Keycloak\Session\SessionCheck;
+
+// after the login
+$_SESSION['keycloak'] = KeycloakSession::fromLogin($result, $keycloak->now())->toArray();
+
+// on every request
+$session = KeycloakSession::fromArray($_SESSION['keycloak'] ?? []);
+$checked = null === $session ? null : (new SessionCheck($keycloak, $revocations, 300))->check($session);
+if (null === $checked) {
+    // log the user out
+} else {
+    $_SESSION['keycloak'] = $checked->toArray();
+}
+```
+
+Keycloak does not always send a back-channel call for every session (e.g. when
+an administrator signs a user out of all sessions), so keep the interval check
+switched on as a safety net.
+
 ### User directory
 
 ```php
