@@ -144,6 +144,7 @@ class KeycloakClient
      * @param string|null $nonce The nonce of the pending login; null only after a refresh
      *
      * @throws InvalidTokenException
+     * @throws HttpException         When the signing keys cannot be loaded
      */
     public function getIdentity(TokenSet $tokens, ?string $nonce): Identity
     {
@@ -170,6 +171,7 @@ class KeycloakClient
      * @param string|null $audience The audience the token must be issued for; defaults to the client id
      *
      * @throws InvalidTokenException
+     * @throws HttpException         When the signing keys cannot be loaded
      */
     public function verifyAccessToken(string $accessToken, ?string $audience = null): Identity
     {

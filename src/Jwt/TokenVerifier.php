@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bannerstop\Keycloak\Jwt;
 
+use Bannerstop\Keycloak\Exception\HttpException;
 use Bannerstop\Keycloak\Exception\InvalidTokenException;
 use Bannerstop\Keycloak\KeycloakConfig;
 use Bannerstop\Keycloak\Token\Claims;
@@ -39,6 +40,7 @@ final class TokenVerifier
      * ID token checks of OpenID Connect Core 3.1.3.7.
      *
      * @throws InvalidTokenException
+     * @throws HttpException
      */
     public function verifyIdToken(string $token, ?string $nonce): Claims
     {
@@ -68,6 +70,7 @@ final class TokenVerifier
      * only names the client that requested the token.
      *
      * @throws InvalidTokenException
+     * @throws HttpException
      */
     public function verifyAccessToken(string $token, string $audience): Claims
     {
@@ -85,6 +88,7 @@ final class TokenVerifier
      * "account"), so the token is bound by azp to this client instead.
      *
      * @throws InvalidTokenException
+     * @throws HttpException
      */
     public function verifyOwnAccessToken(string $token): Claims
     {
@@ -98,6 +102,7 @@ final class TokenVerifier
 
     /**
      * @throws InvalidTokenException
+     * @throws HttpException
      */
     private function verify(string $token, string $expectedType): Claims
     {

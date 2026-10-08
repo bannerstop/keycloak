@@ -116,7 +116,7 @@ final class TokenSet
     /**
      * @return array<string, mixed>
      */
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return [
             'accessToken' => '***',
