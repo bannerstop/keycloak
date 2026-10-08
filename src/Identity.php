@@ -50,6 +50,14 @@ final class Identity
         return false === $at ? null : (string) substr((string) $email, $at + 1);
     }
 
+    /**
+     * Keycloak's session id ("sid"), which back-channel logout tokens name.
+     */
+    public function getSessionId(): ?string
+    {
+        return $this->claims->getString('sid');
+    }
+
     public function getUsername(): ?string
     {
         return $this->claims->getString('preferred_username');
