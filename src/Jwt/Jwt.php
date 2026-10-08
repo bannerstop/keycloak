@@ -22,9 +22,9 @@ final class Jwt
      */
     private function __construct(
         private array $header,
-        private array $payload,
-        private string $signingInput,
-        private string $signature,
+        private readonly array $payload,
+        private readonly string $signingInput,
+        private readonly string $signature,
     ) {
     }
 
@@ -99,6 +99,7 @@ final class Jwt
             return null;
         }
 
-        return is_array($data) && (empty($data) || array_keys($data) !== range(0, count($data) - 1)) ? $data : null;
+        // A JWT header or payload is a JSON object, never a list.
+        return is_array($data) && ([] === $data || !array_is_list($data)) ? $data : null;
     }
 }

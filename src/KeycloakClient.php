@@ -31,21 +31,19 @@ class KeycloakClient
     /** Parameters an application may add to the authorization request. */
     private const AUTHORIZATION_PARAMETERS = ['prompt', 'login_hint', 'kc_idp_hint', 'ui_locales', 'max_age', 'acr_values', 'kc_action'];
 
-    private JsonHttpClient $http;
-    private MetadataProvider $metadata;
-    private TokenVerifier $verifier;
-    private ClockInterface $clock;
+    private readonly JsonHttpClient $http;
+    private readonly MetadataProvider $metadata;
+    private readonly TokenVerifier $verifier;
     private ?TokenSet $serviceAccountTokens = null;
 
     public function __construct(
-        private KeycloakConfig $config,
+        private readonly KeycloakConfig $config,
         ClientInterface $httpClient,
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         ?CacheInterface $cache = null,
-        ?ClockInterface $clock = null,
+        private readonly ClockInterface $clock = new SystemClock(),
     ) {
-        $this->clock = $clock ?? new SystemClock();
         $this->http = new JsonHttpClient($httpClient, $requestFactory, $streamFactory);
         $cacheWrapper = new Cache($cache);
         $this->metadata = new MetadataProvider($this->config, $this->http, $cacheWrapper);

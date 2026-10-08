@@ -15,24 +15,24 @@ use Bannerstop\Keycloak\Jwt\Algorithm;
  */
 final class KeycloakConfig
 {
-    private string $serverUrl;
-    private string $realm;
-    private string $clientId;
-    private ?string $clientSecret;
+    private readonly string $serverUrl;
+    private readonly string $realm;
+    private readonly string $clientId;
+    private readonly ?string $clientSecret;
 
     /** @var string[] */
-    private array $scopes;
+    private readonly array $scopes;
 
-    /** @var string[] */
-    private array $allowedAlgorithms;
-    private int $leeway;
-    private int $metadataTtl;
+    /** @var Algorithm[] */
+    private readonly array $allowedAlgorithms;
+    private readonly int $leeway;
+    private readonly int $metadataTtl;
 
     /**
      * @param string      $serverUrl         Base URL of the Keycloak server, e.g. https://sso.example.com
      * @param string|null $clientSecret      Null for public clients, which then rely on PKCE alone
      * @param string[]    $scopes            "openid" is always added
-     * @param string[]    $allowedAlgorithms Signature algorithms tokens may use, see Algorithm
+     * @param Algorithm[] $allowedAlgorithms Signature algorithms tokens may use
      * @param int         $leeway            Seconds of clock skew tolerated when checking exp, nbf and iat
      * @param int         $metadataTtl       Seconds the discovery document and the key set are cached
      */
@@ -58,8 +58,8 @@ final class KeycloakConfig
             $clientSecret = null;
         }
         foreach ($allowedAlgorithms as $algorithm) {
-            if (!Algorithm::isSupported($algorithm)) {
-                throw new ConfigurationException(sprintf('The signature algorithm "%s" is not supported.', $algorithm));
+            if (!$algorithm instanceof Algorithm) {
+                throw new ConfigurationException('Allowed algorithms must be Algorithm cases.');
             }
         }
         if ([] === $allowedAlgorithms) {
@@ -100,7 +100,7 @@ final class KeycloakConfig
             $options['client_id'],
             isset($options['client_secret']) ? (string) $options['client_secret'] : null,
             isset($options['scopes']) ? (array) $options['scopes'] : ['openid', 'email', 'profile'],
-            isset($options['allowed_algorithms']) ? (array) $options['allowed_algorithms'] : [Algorithm::RS256],
+            self::algorithms($options['allowed_algorithms'] ?? [Algorithm::RS256]),
             isset($options['leeway']) ? (int) $options['leeway'] : 30,
             isset($options['metadata_ttl']) ? (int) $options['metadata_ttl'] : 3600
         );
@@ -150,7 +150,7 @@ final class KeycloakConfig
     }
 
     /**
-     * @return string[]
+     * @return Algorithm[]
      */
     public function getAllowedAlgorithms(): array
     {
@@ -180,9 +180,27 @@ final class KeycloakConfig
             'clientId' => $this->clientId,
             'clientSecret' => null === $this->clientSecret ? null : '***',
             'scopes' => $this->scopes,
-            'allowedAlgorithms' => $this->allowedAlgorithms,
+            'allowedAlgorithms' => array_column($this->allowedAlgorithms, 'value'),
             'leeway' => $this->leeway,
             'metadataTtl' => $this->metadataTtl,
         ];
+    }
+
+    /**
+     * Algorithms from configuration files arrive as names like "RS256".
+     *
+     * @return Algorithm[]
+     */
+    private static function algorithms(mixed $algorithms): array
+    {
+        if (!is_array($algorithms)) {
+            throw new ConfigurationException('The option "allowed_algorithms" must be a list.');
+        }
+
+        return array_map(static fn (mixed $algorithm): Algorithm => match (true) {
+            $algorithm instanceof Algorithm => $algorithm,
+            is_string($algorithm) => Algorithm::tryFrom($algorithm) ?? throw new ConfigurationException(sprintf('The signature algorithm "%s" is not supported.', $algorithm)),
+            default => throw new ConfigurationException('Signature algorithms must be given by name.'),
+        }, array_values($algorithms));
     }
 }

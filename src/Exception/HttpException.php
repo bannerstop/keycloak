@@ -8,7 +8,7 @@ class HttpException extends \RuntimeException implements KeycloakException
 {
     public function __construct(
         string $message,
-        private ?int $statusCode = null,
+        private readonly ?int $statusCode = null,
         ?\Throwable $previous = null,
     ) {
         parent::__construct($message, 0, $previous);

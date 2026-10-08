@@ -19,10 +19,10 @@ final class TestKey
      */
     private function __construct(
         private $privateKey,
-        private array $jwk,
+        private readonly array $jwk,
         public string $algorithm,
         public string $kid,
-        private ?int $ecSize = null,
+        private readonly ?int $ecSize = null,
     ) {
     }
 

@@ -10,6 +10,7 @@ declare(strict_types=1);
 use Bannerstop\Keycloak\Admin\UserDirectory;
 use Bannerstop\Keycloak\Exception\InvalidTokenException;
 use Bannerstop\Keycloak\Exception\LoginException;
+use Bannerstop\Keycloak\Exception\LoginFailure;
 use Bannerstop\Keycloak\KeycloakClient;
 use Bannerstop\Keycloak\KeycloakConfig;
 use Bannerstop\Keycloak\Login\LoginFlow;
@@ -112,7 +113,7 @@ try {
     $flow->finish($query);
     check(false, 'replayed callback is rejected');
 } catch (LoginException $exception) {
-    check(LoginException::STATE_MISMATCH === $exception->getReason(), 'replayed callback is rejected');
+    check(LoginFailure::StateMismatch === $exception->getReason(), 'replayed callback is rejected');
 }
 
 // Bearer tokens
@@ -172,7 +173,7 @@ try {
     $strictFlow->finish(browserLogin($strictFlow->start($callback), 'jdoe', 'jane-password'));
     check(false, 'policy rejects other e-mail domains');
 } catch (LoginException $exception) {
-    check(LoginException::NOT_ALLOWED === $exception->getReason(), 'policy rejects other e-mail domains');
+    check(LoginFailure::NotAllowed === $exception->getReason(), 'policy rejects other e-mail domains');
 }
 
 echo "all checks passed\n";

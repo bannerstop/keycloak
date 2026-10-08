@@ -12,11 +12,11 @@ use Bannerstop\Keycloak\Exception\HttpException;
 final class TokenSet
 {
     public function __construct(
-        private string $accessToken,
-        private ?int $expiresAt,
-        private ?string $refreshToken = null,
-        private ?int $refreshExpiresAt = null,
-        private ?string $idToken = null,
+        private readonly string $accessToken,
+        private readonly ?int $expiresAt,
+        private readonly ?string $refreshToken = null,
+        private readonly ?int $refreshExpiresAt = null,
+        private readonly ?string $idToken = null,
     ) {
     }
 

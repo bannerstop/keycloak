@@ -15,12 +15,12 @@ final class JsonWebKey
     private const CURVE_SIZES = ['P-256' => 32, 'P-384' => 48, 'P-521' => 66, 'Ed25519' => 32];
 
     private function __construct(
-        private ?string $keyId,
-        private string $keyType,
-        private ?string $algorithm,
-        private ?string $curve,
+        private readonly ?string $keyId,
+        private readonly string $keyType,
+        private readonly ?Algorithm $algorithm,
+        private readonly ?string $curve,
         /** @var string PEM for RSA and EC, the raw 32 byte public key for Ed25519 */
-        private string $material
+        private readonly string $material
     )
     {
     }
@@ -39,8 +39,9 @@ final class JsonWebKey
             return null;
         }
         $keyId = self::stringParameter($jwk, 'kid');
-        $algorithm = self::stringParameter($jwk, 'alg');
-        if (null !== $algorithm && (!Algorithm::isSupported($algorithm) || Algorithm::keyType($algorithm) !== $keyType)) {
+        $name = self::stringParameter($jwk, 'alg');
+        $algorithm = null === $name ? null : Algorithm::tryFrom($name);
+        if (null !== $name && (null === $algorithm || $algorithm->keyType() !== $keyType)) {
             return null;
         }
 
@@ -55,7 +56,7 @@ final class JsonWebKey
     /**
      * @param array<mixed> $jwk
      */
-    private static function rsa(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    private static function rsa(array $jwk, ?string $keyId, ?Algorithm $algorithm): ?self
     {
         $modulus = self::binaryParameter($jwk, 'n');
         $exponent = self::binaryParameter($jwk, 'e');
@@ -69,7 +70,7 @@ final class JsonWebKey
     /**
      * @param array<mixed> $jwk
      */
-    private static function ec(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    private static function ec(array $jwk, ?string $keyId, ?Algorithm $algorithm): ?self
     {
         $curve = self::stringParameter($jwk, 'crv');
         $x = self::binaryParameter($jwk, 'x');
@@ -85,7 +86,7 @@ final class JsonWebKey
     /**
      * @param array<mixed> $jwk
      */
-    private static function okp(array $jwk, ?string $keyId, ?string $algorithm): ?self
+    private static function okp(array $jwk, ?string $keyId, ?Algorithm $algorithm): ?self
     {
         $x = self::binaryParameter($jwk, 'x');
         if ('Ed25519' !== self::stringParameter($jwk, 'crv') || null === $x || strlen($x) !== self::CURVE_SIZES['Ed25519']) {
@@ -105,7 +106,7 @@ final class JsonWebKey
         return $this->keyType;
     }
 
-    public function getAlgorithm(): ?string
+    public function getAlgorithm(): ?Algorithm
     {
         return $this->algorithm;
     }
@@ -113,19 +114,19 @@ final class JsonWebKey
     /**
      * Whether this key may verify a signature made with the given algorithm.
      */
-    public function supports(string $algorithm): bool
+    public function supports(Algorithm $algorithm): bool
     {
-        if (!Algorithm::isSupported($algorithm) || Algorithm::keyType($algorithm) !== $this->keyType) {
+        if ($algorithm->keyType() !== $this->keyType) {
             return false;
         }
         if (null !== $this->algorithm && $this->algorithm !== $algorithm) {
             return false;
         }
 
-        return null === Algorithm::curve($algorithm) || Algorithm::curve($algorithm) === $this->curve;
+        return null === $algorithm->curve() || $algorithm->curve() === $this->curve;
     }
 
-    public function verify(string $algorithm, string $signingInput, string $signature): bool
+    public function verify(Algorithm $algorithm, string $signingInput, string $signature): bool
     {
         if (!$this->supports($algorithm)) {
             return false;
@@ -144,7 +145,7 @@ final class JsonWebKey
             }
         }
 
-        return 1 === openssl_verify($signingInput, $signature, $this->material, Algorithm::opensslHash($algorithm));
+        return 1 === openssl_verify($signingInput, $signature, $this->material, $algorithm->opensslHash());
     }
 
     /**

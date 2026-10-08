@@ -7,7 +7,7 @@ namespace Bannerstop\Keycloak\Jwt;
 final class KeySet
 {
     /** @var JsonWebKey[] */
-    private array $keys;
+    private readonly array $keys;
 
     /**
      * @param JsonWebKey[] $keys
@@ -37,7 +37,7 @@ final class KeySet
      * Finds the key for a token header. Without a kid the token is only
      * accepted when exactly one key fits the algorithm.
      */
-    public function find(?string $keyId, string $algorithm): ?JsonWebKey
+    public function find(?string $keyId, Algorithm $algorithm): ?JsonWebKey
     {
         $candidates = [];
         foreach ($this->keys as $key) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bannerstop\Keycloak\Tests\Fixtures;
 
+use Bannerstop\Keycloak\Jwt\Algorithm;
 use Bannerstop\Keycloak\KeycloakClient;
 use Bannerstop\Keycloak\KeycloakConfig;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -39,7 +40,7 @@ final class FakeKeycloak
         $this->clock = new FrozenClock(self::NOW);
         $this->key = $key ?? self::sharedRsaKey();
         $this->publishedKeys = [$this->key->jwk()];
-        $this->config = new KeycloakConfig(self::SERVER, 'example', 'app', $clientSecret, ['openid', 'email', 'profile'], $allowedAlgorithms);
+        $this->config = new KeycloakConfig(self::SERVER, 'example', 'app', $clientSecret, ['openid', 'email', 'profile'], array_map(Algorithm::from(...), $allowedAlgorithms));
 
         $this->http->on('GET', self::ISSUER . '/.well-known/openid-configuration', [200, [
             'issuer' => self::ISSUER,

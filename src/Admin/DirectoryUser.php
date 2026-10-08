@@ -10,13 +10,13 @@ namespace Bannerstop\Keycloak\Admin;
 final class DirectoryUser
 {
     public function __construct(
-        private string $id,
-        private string $username,
-        private ?string $email,
-        private ?string $firstName,
-        private ?string $lastName,
-        private bool $enabled,
-        private bool $emailVerified,
+        private readonly string $id,
+        private readonly string $username,
+        private readonly ?string $email,
+        private readonly ?string $firstName,
+        private readonly ?string $lastName,
+        private readonly bool $enabled,
+        private readonly bool $emailVerified,
     ) {
     }
 

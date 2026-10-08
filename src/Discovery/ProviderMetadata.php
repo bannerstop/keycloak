@@ -12,13 +12,13 @@ use Bannerstop\Keycloak\Exception\HttpException;
 final class ProviderMetadata
 {
     public function __construct(
-        private string $issuer,
-        private string $authorizationEndpoint,
-        private string $tokenEndpoint,
-        private string $jwksUri,
-        private ?string $userinfoEndpoint = null,
-        private ?string $endSessionEndpoint = null,
-        private ?string $revocationEndpoint = null,
+        private readonly string $issuer,
+        private readonly string $authorizationEndpoint,
+        private readonly string $tokenEndpoint,
+        private readonly string $jwksUri,
+        private readonly ?string $userinfoEndpoint = null,
+        private readonly ?string $endSessionEndpoint = null,
+        private readonly ?string $revocationEndpoint = null,
     ) {
     }
 

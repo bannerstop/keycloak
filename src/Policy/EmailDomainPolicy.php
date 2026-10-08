@@ -14,14 +14,14 @@ use Bannerstop\Keycloak\Identity;
 final class EmailDomainPolicy implements IdentityPolicy
 {
     /** @var string[] */
-    private array $domains;
+    private readonly array $domains;
 
     /**
      * @param string[] $domains
      */
     public function __construct(
         array $domains,
-        private bool $requireVerified = true,
+        private readonly bool $requireVerified = true,
     ) {
         $normalized = [];
         foreach ($domains as $domain) {

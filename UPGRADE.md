@@ -3,6 +3,18 @@
 Each major version raises the minimum PHP version. Only the steps that need
 changes in your code are listed.
 
+## 5.x → 6.x
+
+- PHP 8.1 or later is required.
+- Replace `LoginException::STATE_MISMATCH` and the other reason constants with
+  `LoginFailure::StateMismatch`, `Cancelled`, `ProviderError`, `InvalidToken`
+  and `NotAllowed`. `getReason()` returns the enum; use `->value` where you
+  need the old string, e.g. for translation keys.
+- Pass `Algorithm::RS256` instead of `'RS256'` to the `KeycloakConfig`
+  constructor. `KeycloakConfig::fromArray()` keeps accepting strings.
+  `Algorithm::all()` is now `Algorithm::names()`.
+- Do not pass `null` as clock to `KeycloakClient`; leave the argument out.
+
 ## 4.x → 5.x
 
 - PHP 8.0 or later is required.

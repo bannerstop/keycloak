@@ -11,13 +11,11 @@ use Bannerstop\Keycloak\Token\Claims;
  */
 final class Identity
 {
-    private Claims $claims;
-    private string $subject;
+    private readonly string $subject;
 
-    public function __construct(Claims $claims)
+    public function __construct(private readonly Claims $claims)
     {
-        $this->claims = $claims;
-        $this->subject = $claims->getString('sub') ?? throw new \InvalidArgumentException('An identity needs a subject.');
+        $this->subject = $this->claims->getString('sub') ?? throw new \InvalidArgumentException('An identity needs a subject.');
     }
 
     /**

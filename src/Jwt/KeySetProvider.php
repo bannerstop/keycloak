@@ -20,19 +20,19 @@ use Psr\Clock\ClockInterface;
 final class KeySetProvider
 {
     private const MIN_REFRESH_INTERVAL = 60;
-    private ClockInterface $clock;
+    private readonly ClockInterface $clock;
 
     public function __construct(
-        private KeycloakConfig $config,
-        private MetadataProvider $metadata,
-        private JsonHttpClient $http,
-        private Cache $cache,
+        private readonly KeycloakConfig $config,
+        private readonly MetadataProvider $metadata,
+        private readonly JsonHttpClient $http,
+        private readonly Cache $cache,
         ClockInterface $clock,
     ) {
         $this->clock = $clock;
     }
 
-    public function find(?string $keyId, string $algorithm): ?JsonWebKey
+    public function find(?string $keyId, Algorithm $algorithm): ?JsonWebKey
     {
         $cached = $this->cache->get($this->cacheKey());
         if (is_array($cached) && isset($cached['jwks'], $cached['fetched_at']) && is_array($cached['jwks'])) {

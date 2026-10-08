@@ -13,7 +13,7 @@ final class NativeSessionStateStore implements StateStore
     private const MAX_PENDING = 5;
 
     public function __construct(
-        private string $sessionKey = '_bannerstop_keycloak_logins',
+        private readonly string $sessionKey = '_bannerstop_keycloak_logins',
     ) {
     }
 

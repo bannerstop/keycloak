@@ -19,11 +19,11 @@ final class TokenVerifier
     /** Keycloak marks ID tokens with typ "ID" and access tokens with typ "Bearer". */
     private const TYPE_ID = 'ID';
     private const TYPE_ACCESS = 'Bearer';
-    private ClockInterface $clock;
+    private readonly ClockInterface $clock;
 
     public function __construct(
-        private KeycloakConfig $config,
-        private KeySetProvider $keys,
+        private readonly KeycloakConfig $config,
+        private readonly KeySetProvider $keys,
         ClockInterface $clock,
     ) {
         $this->clock = $clock;
@@ -100,9 +100,9 @@ final class TokenVerifier
     private function verify(string $token, string $expectedType): Claims
     {
         $jwt = Jwt::parse($token);
-        $algorithm = $jwt->getAlgorithm();
+        $algorithm = Algorithm::tryFrom((string) $jwt->getAlgorithm());
         if (null === $algorithm || !in_array($algorithm, $this->config->getAllowedAlgorithms(), true)) {
-            throw new InvalidTokenException(sprintf('The signature algorithm "%s" is not allowed.', (string) $algorithm));
+            throw new InvalidTokenException(sprintf('The signature algorithm "%s" is not allowed.', (string) $jwt->getAlgorithm()));
         }
         if ($jwt->hasCriticalHeader()) {
             throw new InvalidTokenException('The token has critical header parameters.');

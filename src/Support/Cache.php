@@ -21,7 +21,7 @@ final class Cache
     private array $memory = [];
 
     public function __construct(
-        private ?CacheInterface $cache = null,
+        private readonly ?CacheInterface $cache = null,
     ) {
     }
 

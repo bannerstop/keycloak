@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 6.0.0
+
+- Requires PHP 8.1 or later.
+- `Algorithm` is a backed enum. `KeycloakConfig` takes and returns `Algorithm`
+  cases; `KeycloakConfig::fromArray()` still accepts names like `"RS256"`.
+- `LoginException::getReason()` returns the new `LoginFailure` enum instead of
+  a string. The enum values are the former strings.
+- `KeycloakClient` defaults its clock to `SystemClock` instead of `null`.
+- Readonly properties throughout.
+
 ## 5.0.0
 
 - Requires PHP 8.0 or later.

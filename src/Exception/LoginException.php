@@ -11,30 +11,15 @@ namespace Bannerstop\Keycloak\Exception;
  */
 class LoginException extends \RuntimeException implements KeycloakException
 {
-    /** The callback does not belong to a login started in this session, or it expired. */
-    public const STATE_MISMATCH = 'state_mismatch';
-
-    /** The user cancelled at the identity provider. */
-    public const CANCELLED = 'cancelled';
-
-    /** The identity provider reported an error or could not be reached. */
-    public const PROVIDER_ERROR = 'provider_error';
-
-    /** The tokens returned by the identity provider failed verification. */
-    public const INVALID_TOKEN = 'invalid_token';
-
-    /** The identity was verified, but an IdentityPolicy rejected it. */
-    public const NOT_ALLOWED = 'not_allowed';
-
     public function __construct(
-        private string $reason,
+        private readonly LoginFailure $reason,
         string $message,
         ?\Throwable $previous = null,
     ) {
         parent::__construct($message, 0, $previous);
     }
 
-    public function getReason(): string
+    public function getReason(): LoginFailure
     {
         return $this->reason;
     }

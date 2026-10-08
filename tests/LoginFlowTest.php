@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bannerstop\Keycloak\Tests;
 
 use Bannerstop\Keycloak\Exception\LoginException;
+use Bannerstop\Keycloak\Exception\LoginFailure;
 use Bannerstop\Keycloak\Login\LoginFlow;
 use Bannerstop\Keycloak\Login\PendingLogin;
 use Bannerstop\Keycloak\Login\StateStore;
@@ -102,7 +103,7 @@ final class LoginFlowTest extends TestCase
         $this->realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [200, $this->tokenResponse($nonce)]);
         $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
 
-        $this->assertLoginFails(LoginException::STATE_MISMATCH, function () use ($state): void {
+        $this->assertLoginFails(LoginFailure::StateMismatch, function () use ($state): void {
             $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
         });
     }
@@ -111,14 +112,14 @@ final class LoginFlowTest extends TestCase
     {
         $this->startLogin();
 
-        $this->assertLoginFails(LoginException::STATE_MISMATCH, function (): void {
+        $this->assertLoginFails(LoginFailure::StateMismatch, function (): void {
             $this->flow()->finish(['state' => 'forged', 'code' => 'the-code']);
         });
     }
 
     public function testRejectsAMissingState(): void
     {
-        $this->assertLoginFails(LoginException::STATE_MISMATCH, function (): void {
+        $this->assertLoginFails(LoginFailure::StateMismatch, function (): void {
             $this->flow()->finish(['code' => 'the-code']);
         });
     }
@@ -128,7 +129,7 @@ final class LoginFlowTest extends TestCase
         $state = $this->startLogin();
         $this->realm->clock->time += 601;
 
-        $this->assertLoginFails(LoginException::STATE_MISMATCH, function () use ($state): void {
+        $this->assertLoginFails(LoginFailure::StateMismatch, function () use ($state): void {
             $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
         });
     }
@@ -137,7 +138,7 @@ final class LoginFlowTest extends TestCase
     {
         $state = $this->startLogin();
 
-        $this->assertLoginFails(LoginException::CANCELLED, function () use ($state): void {
+        $this->assertLoginFails(LoginFailure::Cancelled, function () use ($state): void {
             $this->flow()->finish(['state' => $state, 'error' => 'access_denied']);
         });
     }
@@ -147,7 +148,7 @@ final class LoginFlowTest extends TestCase
         $state = $this->startLogin();
         $this->realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [400, ['error' => 'invalid_grant']]);
 
-        $this->assertLoginFails(LoginException::PROVIDER_ERROR, function () use ($state): void {
+        $this->assertLoginFails(LoginFailure::ProviderError, function () use ($state): void {
             $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
         });
     }
@@ -157,7 +158,7 @@ final class LoginFlowTest extends TestCase
         $state = $this->startLogin();
         $this->realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [200, $this->tokenResponse('another-nonce')]);
 
-        $this->assertLoginFails(LoginException::INVALID_TOKEN, function () use ($state): void {
+        $this->assertLoginFails(LoginFailure::InvalidToken, function () use ($state): void {
             $this->flow()->finish(['state' => $state, 'code' => 'the-code']);
         });
     }
@@ -169,7 +170,7 @@ final class LoginFlowTest extends TestCase
         $this->realm->http->on('POST', FakeKeycloak::TOKEN_ENDPOINT, [200, $this->tokenResponse($nonce)]);
         $flow = new LoginFlow($this->realm->client(), $this->store, [new EmailDomainPolicy(['example.org'])]);
 
-        $this->assertLoginFails(LoginException::NOT_ALLOWED, function () use ($flow, $state): void {
+        $this->assertLoginFails(LoginFailure::NotAllowed, function () use ($flow, $state): void {
             $flow->finish(['state' => $state, 'code' => 'the-code']);
         });
     }
@@ -217,7 +218,7 @@ final class LoginFlowTest extends TestCase
         ];
     }
 
-    private function assertLoginFails(string $reason, callable $finish): void
+    private function assertLoginFails(LoginFailure $reason, callable $finish): void
     {
         try {
             $finish();
@@ -226,6 +227,6 @@ final class LoginFlowTest extends TestCase
 
             return;
         }
-        self::fail(sprintf('The login did not fail with "%s".', $reason));
+        self::fail(sprintf('The login did not fail with "%s".', $reason->value));
     }
 }

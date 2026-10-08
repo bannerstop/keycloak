@@ -7,6 +7,7 @@ namespace Bannerstop\Keycloak\Login;
 use Bannerstop\Keycloak\Exception\HttpException;
 use Bannerstop\Keycloak\Exception\InvalidTokenException;
 use Bannerstop\Keycloak\Exception\LoginException;
+use Bannerstop\Keycloak\Exception\LoginFailure;
 use Bannerstop\Keycloak\KeycloakClient;
 use Bannerstop\Keycloak\Policy\IdentityPolicy;
 
@@ -20,9 +21,9 @@ final class LoginFlow
      * @param IdentityPolicy[] $policies All of them must allow an identity
      */
     public function __construct(
-        private KeycloakClient $client,
-        private StateStore $store,
-        private array $policies = [],
+        private readonly KeycloakClient $client,
+        private readonly StateStore $store,
+        private readonly array $policies = [],
     ) {
     }
 
@@ -53,31 +54,31 @@ final class LoginFlow
         $state = self::parameter($query, 'state');
         $login = null === $state ? null : $this->store->take($state);
         if (null === $login || $login->isExpired($this->client->now())) {
-            throw new LoginException(LoginException::STATE_MISMATCH, 'The callback does not match a pending login.');
+            throw new LoginException(LoginFailure::StateMismatch, 'The callback does not match a pending login.');
         }
 
         $error = self::parameter($query, 'error');
         if (null !== $error) {
-            $reason = 'access_denied' === $error ? LoginException::CANCELLED : LoginException::PROVIDER_ERROR;
+            $reason = 'access_denied' === $error ? LoginFailure::Cancelled : LoginFailure::ProviderError;
             throw new LoginException($reason, sprintf('Keycloak reported "%s".', $error));
         }
         $code = self::parameter($query, 'code');
         if (null === $code) {
-            throw new LoginException(LoginException::PROVIDER_ERROR, 'The callback has no authorization code.');
+            throw new LoginException(LoginFailure::ProviderError, 'The callback has no authorization code.');
         }
 
         try {
             $tokens = $this->client->exchangeCode($code, $login);
             $identity = $this->client->getIdentity($tokens, $login->getNonce());
         } catch (HttpException $exception) {
-            throw new LoginException(LoginException::PROVIDER_ERROR, 'The code exchange failed: ' . $exception->getMessage(), $exception);
+            throw new LoginException(LoginFailure::ProviderError, 'The code exchange failed: ' . $exception->getMessage(), $exception);
         } catch (InvalidTokenException $exception) {
-            throw new LoginException(LoginException::INVALID_TOKEN, 'The tokens failed verification: ' . $exception->getMessage(), $exception);
+            throw new LoginException(LoginFailure::InvalidToken, 'The tokens failed verification: ' . $exception->getMessage(), $exception);
         }
 
         foreach ($this->policies as $policy) {
             if (!$policy->allows($identity)) {
-                throw new LoginException(LoginException::NOT_ALLOWED, sprintf('%s rejected the identity.', $policy::class));
+                throw new LoginException(LoginFailure::NotAllowed, sprintf('%s rejected the identity.', $policy::class));
             }
         }
 

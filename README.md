@@ -29,6 +29,7 @@ Composer does this for you with a `*` or a wide constraint.
 | 3.x     | ≥ 7.3   |
 | 4.x     | ≥ 7.4   |
 | 5.x     | ≥ 8.0   |
+| 6.x     | ≥ 8.1   |
 
 ## Installation
 
@@ -103,7 +104,7 @@ header('Location: ' . $flow->start('https://app.example.com/callback.php', $_GET
 try {
     $result = $flow->finish($_GET);
 } catch (LoginException $exception) {
-    // $exception->getReason(): state_mismatch, cancelled, provider_error, invalid_token, not_allowed
+    // $exception->getReason() is a LoginFailure: StateMismatch, Cancelled, ProviderError, InvalidToken, NotAllowed
 }
 session_regenerate_id(true);
 $identity = $result->getIdentity();

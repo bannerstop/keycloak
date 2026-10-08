@@ -17,9 +17,9 @@ use Bannerstop\Keycloak\Support\Cache;
 final class MetadataProvider
 {
     public function __construct(
-        private KeycloakConfig $config,
-        private JsonHttpClient $http,
-        private Cache $cache,
+        private readonly KeycloakConfig $config,
+        private readonly JsonHttpClient $http,
+        private readonly Cache $cache,
     ) {
     }
 

@@ -10,75 +10,57 @@ namespace Bannerstop\Keycloak\Jwt;
  * Symmetric algorithms (HS256 and friends) and "none" are deliberately not
  * supported: with a public key set they only open the door to key confusion.
  */
-final class Algorithm
+enum Algorithm: string
 {
-    public const RS256 = 'RS256';
-    public const RS384 = 'RS384';
-    public const RS512 = 'RS512';
-    public const ES256 = 'ES256';
-    public const ES384 = 'ES384';
-    public const ES512 = 'ES512';
-    public const EDDSA = 'EdDSA';
+    case RS256 = 'RS256';
+    case RS384 = 'RS384';
+    case RS512 = 'RS512';
+    case ES256 = 'ES256';
+    case ES384 = 'ES384';
+    case ES512 = 'ES512';
+    case EdDSA = 'EdDSA';
 
-    private const DEFINITIONS = [
-        self::RS256 => ['kty' => 'RSA', 'hash' => OPENSSL_ALGO_SHA256, 'crv' => null],
-        self::RS384 => ['kty' => 'RSA', 'hash' => OPENSSL_ALGO_SHA384, 'crv' => null],
-        self::RS512 => ['kty' => 'RSA', 'hash' => OPENSSL_ALGO_SHA512, 'crv' => null],
-        self::ES256 => ['kty' => 'EC', 'hash' => OPENSSL_ALGO_SHA256, 'crv' => 'P-256'],
-        self::ES384 => ['kty' => 'EC', 'hash' => OPENSSL_ALGO_SHA384, 'crv' => 'P-384'],
-        self::ES512 => ['kty' => 'EC', 'hash' => OPENSSL_ALGO_SHA512, 'crv' => 'P-521'],
-        self::EDDSA => ['kty' => 'OKP', 'hash' => null, 'crv' => 'Ed25519'],
-    ];
-
-    private function __construct()
+    /**
+     * The JWK key type ("kty") a key needs for this algorithm.
+     */
+    public function keyType(): string
     {
+        return match ($this) {
+            self::RS256, self::RS384, self::RS512 => 'RSA',
+            self::ES256, self::ES384, self::ES512 => 'EC',
+            self::EdDSA => 'OKP',
+        };
     }
 
-    public static function isSupported(string $algorithm): bool
+    /**
+     * The curve an EC or OKP key must use, null for RSA.
+     */
+    public function curve(): ?string
     {
-        return isset(self::DEFINITIONS[$algorithm]);
+        return match ($this) {
+            self::ES256 => 'P-256',
+            self::ES384 => 'P-384',
+            self::ES512 => 'P-521',
+            self::EdDSA => 'Ed25519',
+            default => null,
+        };
+    }
+
+    public function opensslHash(): int
+    {
+        return match ($this) {
+            self::RS256, self::ES256 => OPENSSL_ALGO_SHA256,
+            self::RS384, self::ES384 => OPENSSL_ALGO_SHA384,
+            self::RS512, self::ES512 => OPENSSL_ALGO_SHA512,
+            self::EdDSA => throw new \LogicException('EdDSA is not verified through OpenSSL.'),
+        };
     }
 
     /**
      * @return string[]
      */
-    public static function all(): array
+    public static function names(): array
     {
-        return array_keys(self::DEFINITIONS);
-    }
-
-    public static function keyType(string $algorithm): string
-    {
-        return self::definition($algorithm)['kty'];
-    }
-
-    public static function opensslHash(string $algorithm): int
-    {
-        $hash = self::definition($algorithm)['hash'];
-        if (null === $hash) {
-            throw new \LogicException(sprintf('%s is not verified through OpenSSL.', $algorithm));
-        }
-
-        return $hash;
-    }
-
-    /**
-     * The curve an EC or OKP key must use for this algorithm, null for RSA.
-     */
-    public static function curve(string $algorithm): ?string
-    {
-        return self::definition($algorithm)['crv'];
-    }
-
-    /**
-     * @return array{kty: string, hash: int|null, crv: string|null}
-     */
-    private static function definition(string $algorithm): array
-    {
-        if (!isset(self::DEFINITIONS[$algorithm])) {
-            throw new \InvalidArgumentException(sprintf('Unsupported algorithm "%s".', $algorithm));
-        }
-
-        return self::DEFINITIONS[$algorithm];
+        return array_column(self::cases(), 'value');
     }
 }
