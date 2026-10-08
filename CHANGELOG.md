@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/). Each major version raises the
 minimum PHP version and uses the language features that come with it.
 
+## 3.0.0
+
+- Requires PHP 7.3 or later.
+- JSON from tokens and from Keycloak is decoded with `JSON_THROW_ON_ERROR`;
+  malformed documents are reported as before (`InvalidTokenException`,
+  `HttpException`).
+
 ## 2.0.0
 
 - Requires PHP 7.2 or later. The API is unchanged; the major version marks the

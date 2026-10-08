@@ -87,8 +87,11 @@ final class JsonHttpClient
         }
 
         $status = $response->getStatusCode();
-        $body = (string) $response->getBody();
-        $data = json_decode($body, true);
+        try {
+            $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            $data = null;
+        }
         if ($status < 200 || $status >= 300) {
             $error = is_array($data) && isset($data['error']) && is_string($data['error']) ? $data['error'] : 'no error code';
             throw new HttpException(sprintf('%s returned HTTP %d (%s).', $target, $status, $error), $status);

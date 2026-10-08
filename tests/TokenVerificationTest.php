@@ -212,7 +212,7 @@ final class TokenVerificationTest extends TestCase
             'no iat' => [['iat' => null], 'iat'],
             'access token as id token' => [['typ' => 'Bearer'], 'type'],
         ];
-        foreach ($cases as $case => list($claims, $message)) {
+        foreach ($cases as $case => [$claims, $message]) {
             $tokens = new TokenSet('opaque', null, null, null, $realm->key->sign(FakeKeycloak::idClaims($claims)));
             try {
                 $realm->client()->getIdentity($tokens, 'the-nonce');

@@ -105,7 +105,11 @@ final class Jwt
         if (null === $json) {
             return null;
         }
-        $data = json_decode($json, true, 32);
+        try {
+            $data = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            return null;
+        }
 
         return is_array($data) && (empty($data) || array_keys($data) !== range(0, count($data) - 1)) ? $data : null;
     }
