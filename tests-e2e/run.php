@@ -91,6 +91,7 @@ $flow = new LoginFlow($client, new NativeSessionStateStore(), [new EmailDomainPo
 // Browser login, confidential client
 $query = browserLogin($flow->start($callback, '/orders'), 'jdoe', 'jane-password');
 check(isset($query['code'], $query['state']), 'Keycloak redirects back with code and state');
+check(($query['iss'] ?? null) === $client->getConfig()->getIssuer(), 'Keycloak names itself in the callback (RFC 9207)');
 $result = $flow->finish($query);
 $identity = $result->getIdentity();
 check('jane.doe@example.com' === $identity->getEmail() && $identity->isEmailVerified(), 'identity has the verified e-mail');
