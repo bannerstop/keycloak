@@ -19,6 +19,7 @@ final class ProviderMetadata
         private readonly ?string $userinfoEndpoint = null,
         private readonly ?string $endSessionEndpoint = null,
         private readonly ?string $revocationEndpoint = null,
+        private readonly bool $issuerParameterSupported = false,
     ) {
     }
 
@@ -42,7 +43,8 @@ final class ProviderMetadata
             $document['jwks_uri'],
             $optional('userinfo_endpoint'),
             $optional('end_session_endpoint'),
-            $optional('revocation_endpoint')
+            $optional('revocation_endpoint'),
+            true === ($document['authorization_response_iss_parameter_supported'] ?? false)
         );
     }
 
@@ -59,6 +61,7 @@ final class ProviderMetadata
             'userinfo_endpoint' => $this->userinfoEndpoint,
             'end_session_endpoint' => $this->endSessionEndpoint,
             'revocation_endpoint' => $this->revocationEndpoint,
+            'authorization_response_iss_parameter_supported' => $this->issuerParameterSupported,
         ];
     }
 
@@ -95,5 +98,14 @@ final class ProviderMetadata
     public function getRevocationEndpoint(): ?string
     {
         return $this->revocationEndpoint;
+    }
+
+    /**
+     * Whether the provider names itself in every authorization response
+     * (RFC 9207). Then a callback without "iss" must be rejected.
+     */
+    public function isIssuerParameterSupported(): bool
+    {
+        return $this->issuerParameterSupported;
     }
 }
